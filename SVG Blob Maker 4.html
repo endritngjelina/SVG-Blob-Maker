@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Blob Maker Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            min-height: 100vh;
+        }
+
+        .main-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .blob-canvas {
+            width: 100%;
+            height: 500px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .blob-svg {
+            max-width: 90%;
+            max-height: 90%;
+            drop-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .control-group h3 {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .slider-value {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-input {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .color-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .history-panel, .stats-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .history-panel h2, .stats-panel h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            background: #f8f9fa;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
+        }
+
+        .history-item.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .history-preview {
+            width: 50px;
+            height: 40px;
+            border-radius: 6px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-preview svg {
+            width: 35px;
+            height: 30px;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-info h4 {
+            font-size: 0.9rem;
+            color: #495057;
+            margin-bottom: 2px;
+        }
+
+        .history-info small {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-small.btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-small.btn-danger:hover {
+            background: #c82333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .export-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .export-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .randomize-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .side-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-panel">
+            <h1>SVG Blob Maker Pro</h1>
+            
+            <div class="blob-canvas" id="blobCanvas">
+                <svg id="blobSvg" width="400" height="300" viewBox="0 0 400 300">
+                    <path id="blobPath" fill="#667eea" d=""></path>
+                </svg>
+            </div>
+
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Shape Properties</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Complexity</span>
+                            <span class="slider-value" id="complexityValue">6</span>
+                        </div>
+                        <input type="range" class="slider" id="complexity" min="3" max="12" value="6">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Contrast</span>
+                            <span class="slider-value" id="contrastValue">0.7</span>
+                        </div>
+                        <input type="range" class="slider" id="contrast" min="0.3" max="1.0" step="0.1" value="0.7">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Size</span>
+                            <span class="slider-value" id="sizeValue">200</span>
+                        </div>
+                        <input type="range" class="slider" id="size" min="100" max="300" value="200">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Style</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Fill Color</span>
+                        </div>
+                        <input type="color" class="color-input" id="fillColor" value="#667eea">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Stroke Width</span>
+                            <span class="slider-value" id="strokeWidthValue">0</span>
+                        </div>
+                        <input type="range" class="slider" id="strokeWidth" min="0" max="10" value="0">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Stroke Color</span>
+                        </div>
+                        <input type="color" class="color-input" id="strokeColor" value="#000000">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Animation</h3>
+                    <div class="animation-controls">
+                        <button class="btn btn-secondary btn-small" id="animateBtn">▶️ Animate</button>
+                        <button class="btn btn-secondary btn-small" id="stopAnimationBtn">⏹️ Stop</button>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Speed</span>
+                            <span class="slider-value" id="animationSpeedValue">2</span>
+                        </div>
+                        <input type="range" class="slider" id="animationSpeed" min="0.5" max="5" step="0.5" value="2">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Generate</h3>
+                    <div class="randomize-group">
+                        <button class="btn btn-primary" id="generateBtn">🎲 New Blob</button>
+                        <button class="btn btn-info" id="seedBtn">🌱 Use Seed</button>
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Seed</span>
+                            <span class="slider-value" id="seedValue">42</span>
+                        </div>
+                        <input type="range" class="slider" id="seed" min="1" max="1000" value="42">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-success" id="exportSvgBtn">📁 Export SVG</button>
+                <button class="btn btn-info" id="exportCodeBtn">📋 Get Code</button>
+                <button class="btn btn-secondary" id="saveToHistoryBtn">💾 Save to History</button>
+                <button class="btn btn-primary" id="randomizeAllBtn">🎨 Randomize All</button>
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="stats-panel">
+                <h2>📊 Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalBlobs">0</div>
+                        <div class="stat-label">Total Blobs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayBlobs">0</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgComplexity">6</div>
+                        <div class="stat-label">Avg Complexity</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="favoriteColor">#667eea</div>
+                        <div class="stat-label">Top Color</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-panel">
+                <h2>📚 History</h2>
+                <div class="history-controls">
+                    <button class="btn btn-secondary btn-small" id="clearHistoryBtn">🗑️ Clear All</button>
+                    <button class="btn btn-info btn-small" id="exportHistoryBtn">📤 Export History</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <p style="text-align: center; color: #6c757d; margin: 20px 0;">No blobs created yet. Generate your first blob!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="export-modal" id="exportModal">
+        <div class="export-content">
+            <h2 id="exportTitle">Export Blob</h2>
+            <div id="exportContent"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" id="closeModalBtn">Close</button>
+                <button class="btn btn-success" id="copyCodeBtn" style="display: none;">Copy to Clipboard</button>
+                <button class="btn btn-primary" id="downloadBtn" style="display: none;">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        class BlobMaker {
+            constructor() {
+                this.svg = document.getElementById('blobSvg');
+                this.path = document.getElementById('blobPath');
+                this.history = JSON.parse(localStorage.getItem('blobHistory') || '[]');
+                this.currentBlob = null;
+                this.animationId = null;
+                this.animationStartTime = null;
+                
+                this.initializeControls();
+                this.loadHistory();
+                this.updateStats();
+                this.generateBlob();
+            }
+
+            initializeControls() {
+                // Slider controls
+                const controls = [
+                    'complexity', 'contrast', 'size', 'strokeWidth', 'animationSpeed', 'seed'
+                ];
+                
+                controls.forEach(control => {
+                    const slider = document.getElementById(control);
+                    const valueDisplay = document.getElementById(control + 'Value');
+                    
+                    slider.addEventListener('input', (e) => {
+                        valueDisplay.textContent = e.target.value;
+                        if (control !== 'animationSpeed') {
+                            this.generateBlob();
+                        }
+                    });
+                });
+
+                // Color controls
+                document.getElementById('fillColor').addEventListener('change', () => this.updateStyle());
+                document.getElementById('strokeColor').addEventListener('change', () => this.updateStyle());
+
+                // Button controls
+                document.getElementById('generateBtn').addEventListener('click', () => this.generateBlob());
+                document.getElementById('seedBtn').addEventListener('click', () => this.generateBlobFromSeed());
+                document.getElementById('randomizeAllBtn').addEventListener('click', () => this.randomizeAll());
+                document.getElementById('saveToHistoryBtn').addEventListener('click', () => this.saveToHistory());
+                document.getElementById('exportSvgBtn').addEventListener('click', () => this.exportSVG());
+                document.getElementById('exportCodeBtn').addEventListener('click', () => this.exportCode());
+                document.getElementById('clearHistoryBtn').addEventListener('click', () => this.clearHistory());
+                document.getElementById('exportHistoryBtn').addEventListener('click', () => this.exportHistory());
+
+                // Animation controls
+                document.getElementById('animateBtn').addEventListener('click', () => this.startAnimation());
+                document.getElementById('stopAnimationBtn').addEventListener('click', () => this.stopAnimation());
+
+                // Modal controls
+                document.getElementById('closeModalBtn').addEventListener('click', () => this.closeModal());
+                document.getElementById('copyCodeBtn').addEventListener('click', () => this.copyToClipboard());
+                document.getElementById('downloadBtn').addEventListener('click', () => this.downloadFile());
+
+                // Close modal on outside click
+                document.getElementById('exportModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'exportModal') this.closeModal();
+                });
+            }
+
+            generateBlob() {
+                const complexity = parseInt(document.getElementById('complexity').value);
+                const contrast = parseFloat(document.getElementById('contrast').value);
+                const size = parseInt(document.getElementById('size').value);
+                
+                this.currentBlob = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    complexity,
+                    contrast,
+                    size,
+                    fillColor: document.getElementById('fillColor').value,
+                    strokeColor: document.getElementById('strokeColor').value,
+                    strokeWidth: parseInt(document.getElementById('strokeWidth').value),
+                    seed: parseInt(document.getElementById('seed').value)
+                };
+
+                const pathData = this.createBlobPath(complexity, contrast, size);
+                this.currentBlob.pathData = pathData;
+                
+                this.path.setAttribute('d', pathData);
+                this.updateStyle();
+                this.centerBlob();
+            }
+
+            generateBlobFromSeed() {
+                this.currentBlob.seed = parseInt(document.getElementById('seed').value);
+                this.generateBlob();
+            }
+
+            createBlobPath(complexity, contrast, size) {
+                const seed = this.currentBlob.seed;
+                this.seedRandom(seed);
+                
+                const centerX = 200;
+                const centerY = 150;
+                const points = [];
+                
+                for (let i = 0; i < complexity; i++) {
+                    const angle = (i / complexity) * 2 * Math.PI;
+                    const radius = size * (0.5 + (this.seededRandom() - 0.5) * contrast);
+                    
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    points.push({ x, y, angle, radius });
+                }
+
+                return this.createSmoothPath(points);
+            }
+
+            createSmoothPath(points) {
+                if (points.length < 3) return '';
+                
+                const smoothness = 0.3;
+                let path = `M ${points[0].x} ${points[0].y}`;
+                
+                for (let i = 0; i < points.length; i++) {
+                    const current = points[i];
+                    const next = points[(i + 1) % points.length];
+                    const prev = points[(i - 1 + points.length) % points.length];
+                    
+                    const cp1x = current.x + (next.x - prev.x) * smoothness;
+                    const cp1y = current.y + (next.y - prev.y) * smoothness;
+                    const cp2x = next.x - (points[(i + 2) % points.length].x - current.x) * smoothness;
+                    const cp2y = next.y - (points[(i + 2) % points.length].y - current.y) * smoothness;
+                    
+                    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                }
+                
+                path += ' Z';
+                return path;
+            }
+
+            updateStyle() {
+                const fillColor = document.getElementById('fillColor').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const strokeWidth = document.getElementById('strokeWidth').value;
+                
+                this.path.setAttribute('fill', fillColor);
+                this.path.setAttribute('stroke', strokeColor);
+                this.path.setAttribute('stroke-width', strokeWidth);
+                
+                if (this.currentBlob) {
+                    this.currentBlob.fillColor = fillColor;
+                    this.currentBlob.strokeColor = strokeColor;
+                    this.currentBlob.strokeWidth = parseInt(strokeWidth);
+                }
+            }
+
+            centerBlob() {
+                const bbox = this.path.getBBox();
+                const viewBoxWidth = 400;
+                const viewBoxHeight = 300;
+                const scale = Math.min(viewBoxWidth / bbox.width, viewBoxHeight / bbox.height) * 0.8;
+                
+                const translateX = (viewBoxWidth - bbox.width * scale) / 2 - bbox.x * scale;
+                const translateY = (viewBoxHeight - bbox.height * scale) / 2 - bbox.y * scale;
+                
+                this.path.setAttribute('transform', `translate(${translateX}, ${translateY}) scale(${scale})`);
+            }
+
+            randomizeAll() {
+                document.getElementById('complexity').value = Math.floor(Math.random() * 10) + 3;
+                document.getElementById('contrast').value = (Math.random() * 0.7 + 0.3).toFixed(1);
+                document.getElementById('size').value = Math.floor(Math.random() * 200) + 100;
+                document.getElementById('strokeWidth').value = Math.floor(Math.random() * 6);
+                document.getElementById('seed').value = Math.floor(Math.random() * 1000) + 1;
+                
+                // Random colors
+                document.getElementById('fillColor').value = this.generateRandomColor();
+                document.getElementById('strokeColor').value = this.generateRandomColor();
+                
+                // Update displays
+                document.getElementById('complexityValue').textContent = document.getElementById('complexity').value;
+                document.getElementById('contrastValue').textContent = document.getElementById('contrast').value;
+                document.getElementById('sizeValue').textContent = document.getElementById('size').value;
+                document.getElementById('strokeWidthValue').textContent = document.getElementById('strokeWidth').value;
+                document.getElementById('seedValue').textContent = document.getElementById('seed').value;
+                
+                this.generateBlob();
+            }
+
+            generateRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            startAnimation() {
+                if (this.animationId) return;
+                
+                this.animationStartTime = Date.now();
+                const originalPath = this.currentBlob.pathData;
+                const speed = parseFloat(document.getElementById('animationSpeed').value);
+                
+                const animate = () => {
+                    const elapsed = (Date.now() - this.animationStartTime) / 1000;
+                    const variation = Math.sin(elapsed * speed) * 0.1;
+                    
+                    // Create animated version by slightly modifying the path
+                    const animatedPath = this.createBlobPath(
+                        this.currentBlob.complexity,
+                        this.currentBlob.contrast + variation,
+                        this.currentBlob.size
+                    );
+                    
+                    this.path.setAttribute('d', animatedPath);
+                    this.centerBlob();
+                    
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                
+                animate();
+            }
+
+            stopAnimation() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                    this.generateBlob(); // Reset to original
+                }
+            }
+
+            saveToHistory() {
+                if (!this.currentBlob) return;
+                
+                const blobData = {
+                    ...this.currentBlob,
+                    name: `Blob ${this.history.length + 1}`,
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.history.unshift(blobData);
+                if (this.history.length > 50) this.history.pop(); // Keep only 50 recent blobs
+                
+                localStorage.setItem('blobHistory', JSON.stringify(this.history));
+                this.loadHistory();
+                this.updateStats();
+                this.showNotification('Blob saved to history!');
+            }
+
+            loadHistory() {
+                const historyList = document.getElementById('historyList');
+                
+                if (this.history.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; color: #6c757d; margin: 20px 0;">No blobs created yet. Generate your first blob!</p>';
+                    return;
+                }
+                
+                historyList.innerHTML = '';
+                
+                this.history.forEach((blob, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div class="history-preview">
+                            <svg width="35" height="30" viewBox="0 0 400 300">
+                                <path d="${blob.pathData}" fill="${blob.fillColor}" stroke="${blob.strokeColor}" stroke-width="${blob.strokeWidth}"/>
+                            </svg>
+                        </div>
+                        <div class="history-info">
+                            <h4>${blob.name}</h4>
+                            <small>${new Date(blob.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-small btn-danger" onclick="blobMaker.deleteFromHistory(${index})">×</button>
+                        </div>
+                    `;
+                    
+                    item.addEventListener('click', () => this.loadFromHistory(blob));
+                    historyList.appendChild(item);
+                });
+            }
+
+            loadFromHistory(blob) {
+                // Update controls
+                document.getElementById('complexity').value = blob.complexity;
+                document.getElementById('contrast').value = blob.contrast;
+                document.getElementById('size').value = blob.size;
+                document.getElementById('fillColor').value = blob.fillColor;
+                document.getElementById('strokeColor').value = blob.strokeColor;
+                document.getElementById('strokeWidth').value = blob.strokeWidth;
+                document.getElementById('seed').value = blob.seed;
+                
+                // Update displays
+                document.getElementById('complexityValue').textContent = blob.complexity;
+                document.getElementById('contrastValue').textContent = blob.contrast;
+                document.getElementById('sizeValue').textContent = blob.size;
+                document.getElementById('strokeWidthValue').textContent = blob.strokeWidth;
+                document.getElementById('seedValue').textContent = blob.seed;
+                
+                // Update current blob
+                this.currentBlob = { ...blob };
+                this.path.setAttribute('d', blob.pathData);
+                this.updateStyle();
+                this.centerBlob();
+                
+                // Highlight selected item
+                document.querySelectorAll('.history-item').forEach(item => item.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+                
+                this.showNotification('Blob loaded from history!');
+            }
+
+            deleteFromHistory(index) {
+                this.history.splice(index, 1);
+                localStorage.setItem('blobHistory', JSON.stringify(this.history));
+                this.loadHistory();
+                this.updateStats();
+                this.showNotification('Blob deleted from history');
+            }
+
+            clearHistory() {
+                if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                    this.history = [];
+                    localStorage.removeItem('blobHistory');
+                    this.loadHistory();
+                    this.updateStats();
+                    this.showNotification('History cleared');
+                }
+            }
+
+            updateStats() {
+                const totalBlobs = this.history.length;
+                const today = new Date().toDateString();
+                const todayBlobs = this.history.filter(blob => 
+                    new Date(blob.timestamp).toDateString() === today
+                ).length;
+                
+                const avgComplexity = totalBlobs > 0 ? 
+                    Math.round(this.history.reduce((sum, blob) => sum + blob.complexity, 0) / totalBlobs) : 6;
+                
+                // Find most used color
+                const colorCounts = {};
+                this.history.forEach(blob => {
+                    colorCounts[blob.fillColor] = (colorCounts[blob.fillColor] || 0) + 1;
+                });
+                
+                const favoriteColor = Object.keys(colorCounts).length > 0 ? 
+                    Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b) : '#667eea';
+                
+                document.getElementById('totalBlobs').textContent = totalBlobs;
+                document.getElementById('todayBlobs').textContent = todayBlobs;
+                document.getElementById('avgComplexity').textContent = avgComplexity;
+                document.getElementById('favoriteColor').textContent = favoriteColor.toUpperCase();
+                document.getElementById('favoriteColor').style.color = favoriteColor;
+            }
+
+            exportSVG() {
+                const svgContent = this.generateSVGCode();
+                this.showExportModal('Export SVG', svgContent, 'svg', 'blob.svg');
+            }
+
+            exportCode() {
+                const svgCode = this.generateSVGCode();
+                const htmlCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blob</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .blob-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="blob-container">
+        ${svgCode}
+    </div>
+</body>
+</html>`;
+                
+                this.showExportModal('Export HTML Code', htmlCode, 'html', 'blob.html');
+            }
+
+            exportHistory() {
+                const historyData = {
+                    exportDate: new Date().toISOString(),
+                    totalBlobs: this.history.length,
+                    blobs: this.history
+                };
+                
+                const jsonContent = JSON.stringify(historyData, null, 2);
+                this.showExportModal('Export History', jsonContent, 'json', 'blob-history.json');
+            }
+
+            generateSVGCode() {
+                const bbox = this.path.getBBox();
+                const padding = 20;
+                const width = Math.ceil(bbox.width + padding * 2);
+                const height = Math.ceil(bbox.height + padding * 2);
+                
+                return `<svg width="${width}" height="${height}" viewBox="${bbox.x - padding} ${bbox.y - padding} ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .blob-path {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      }
+    </style>
+  </defs>
+  <path class="blob-path" d="${this.currentBlob.pathData}" 
+        fill="${this.currentBlob.fillColor}" 
+        stroke="${this.currentBlob.strokeColor}" 
+        stroke-width="${this.currentBlob.strokeWidth}"/>
+</svg>`;
+            }
+
+            showExportModal(title, content, type, filename) {
+                document.getElementById('exportTitle').textContent = title;
+                const exportContent = document.getElementById('exportContent');
+                
+                exportContent.innerHTML = `
+                    <div class="code-block">${this.escapeHtml(content)}</div>
+                `;
+                
+                document.getElementById('copyCodeBtn').style.display = 'inline-block';
+                document.getElementById('downloadBtn').style.display = 'inline-block';
+                document.getElementById('exportModal').classList.add('active');
+                
+                this.currentExport = { content, type, filename };
+            }
+
+            closeModal() {
+                document.getElementById('exportModal').classList.remove('active');
+            }
+
+            copyToClipboard() {
+                navigator.clipboard.writeText(this.currentExport.content).then(() => {
+                    this.showNotification('Code copied to clipboard!');
+                }).catch(() => {
+                    this.showNotification('Failed to copy to clipboard', 'error');
+                });
+            }
+
+            downloadFile() {
+                const blob = new Blob([this.currentExport.content], {
+                    type: this.getContentType(this.currentExport.type)
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = this.currentExport.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showNotification(`Downloaded ${this.currentExport.filename}!`);
+            }
+
+            getContentType(type) {
+                const types = {
+                    'svg': 'image/svg+xml',
+                    'html': 'text/html',
+                    'json': 'application/json'
+                };
+                return types[type] || 'text/plain';
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            // Seeded random number generator for consistent blob generation
+            seedRandom(seed) {
+                this._seed = seed;
+            }
+
+            seededRandom() {
+                this._seed = (this._seed * 9301 + 49297) % 233280;
+                return this._seed / 233280;
+            }
+        }
+
+        // Initialize the application
+        let blobMaker;
+        document.addEventListener('DOMContentLoaded', () => {
+            blobMaker = new BlobMaker();
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        blobMaker.generateBlob();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        blobMaker.saveToHistory();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        blobMaker.exportSVG();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        blobMaker.randomizeAll();
+                        break;
+                }
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                blobMaker.generateBlob();
+            }
+        });
+
+        // Add touch support for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.getElementById('blobCanvas').addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.getElementById('blobCanvas').addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            
+            if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+                blobMaker.generateBlob();
+            }
+        });
+
+        // Performance monitoring
+        const performanceObserver = new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            entries.forEach((entry) => {
+                if (entry.duration > 16) { // More than one frame
+                    console.log(`Performance warning: ${entry.name} took ${entry.duration}ms`);
+                }
+            });
+        });
+
+        try {
+            performanceObserver.observe({ entryTypes: ['measure', 'navigation'] });
+        } catch (e) {
+            // Performance Observer not supported
+        }
+    </script>
+</body>
+</html>
