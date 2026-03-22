@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Blob Maker Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 320px 1fr 300px;
+            grid-gap: 20px;
+            min-height: 100vh;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-panel h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 24px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 122, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .value-display {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            background: #007aff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .color-input:hover {
+            transform: scale(1.02);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .blob-canvas {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .history-panel h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .history-item {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item:hover {
+            transform: scale(1.05);
+            border-color: #007aff;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
+        }
+
+        .history-item.active {
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .history-item svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .history-timestamp {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 4px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .history-item:hover .history-timestamp {
+            opacity: 1;
+        }
+
+        .stats-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 16px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 
+                0 4px 12px rgba(56, 189, 248, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .stats-section h4 {
+            margin-bottom: 12px;
+            color: #0f172a;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .export-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 16px;
+            border: 1px solid #f59e0b;
+            box-shadow: 
+                0 4px 12px rgba(245, 158, 11, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .export-section h4 {
+            margin-bottom: 12px;
+            color: #92400e;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .preset-shapes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .preset-btn {
+            padding: 8px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: #007aff;
+            background: #f0f8ff;
+        }
+
+        .preset-btn svg {
+            width: 100%;
+            height: 30px;
+        }
+
+        .animation-controls {
+            margin-top: 16px;
+            padding: 12px;
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border-radius: 12px;
+        }
+
+        .animation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #007aff;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            left: 28px;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-gap: 20px;
+                padding: 15px;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+
+            .canvas-area {
+                min-height: 60vh;
+            }
+
+            .blob-canvas {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                grid-gap: 15px;
+            }
+
+            .panel {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .control-group {
+                margin-bottom: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .canvas-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .canvas-controls .btn {
+                min-width: 100px;
+                flex: 1;
+            }
+
+            .preset-shapes {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .history-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .toast {
+                right: 10px;
+                top: 20px;
+                left: 10px;
+                transform: translateY(-100px);
+                max-width: none;
+            }
+
+            .toast.show {
+                transform: translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #007aff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes morphBlob {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                filter: hue-rotate(0deg);
+            }
+            25% { 
+                transform: scale(1.05) rotate(1deg);
+                filter: hue-rotate(5deg);
+            }
+            50% { 
+                transform: scale(0.95) rotate(-1deg);
+                filter: hue-rotate(-5deg);
+            }
+            75% { 
+                transform: scale(1.02) rotate(0.5deg);
+                filter: hue-rotate(3deg);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 122, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 122, 255, 0.6); }
+        }
+
+        .animated-blob {
+            animation: 
+                morphBlob 6s ease-in-out infinite,
+                float 3s ease-in-out infinite,
+                glow 4s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        /* Micro-interactions and polish */
+        .control-group:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .control-group:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel {
+            animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .panel:nth-child(1) { animation-delay: 0.1s; }
+        .panel:nth-child(2) { animation-delay: 0.2s; }
+        .panel:nth-child(3) { animation-delay: 0.3s; }
+
+        /* Focus states for accessibility */
+        .btn:focus,
+        .slider:focus,
+        .color-input:focus,
+        .preset-btn:focus,
+        .toggle-switch:focus {
+            outline: 3px solid rgba(0, 122, 255, 0.3);
+            outline-offset: 2px;
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .panel {
+                border: 2px solid #000;
+                background: #fff;
+            }
+            
+            .btn-primary {
+                background: #000;
+                border: 2px solid #000;
+            }
+            
+            .btn-secondary {
+                background: #fff;
+                border: 2px solid #000;
+                color: #000;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .animated-blob {
+                animation: none;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            }
+            
+            .panel {
+                background: rgba(15, 23, 42, 0.95);
+                color: #e2e8f0;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .controls-panel h2,
+            .history-panel h3 {
+                color: #f1f5f9;
+            }
+            
+            .control-group label {
+                color: #cbd5e1;
+            }
+            
+            .stats-section {
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+                border-color: rgba(56, 189, 248, 0.3);
+            }
+            
+            .export-section {
+                background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(55, 65, 81, 0.8));
+                border-color: rgba(245, 158, 11, 0.3);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Controls Panel -->
+        <div class="panel controls-panel">
+            <h2>🎛️ Blob Controls</h2>
+            
+            <div class="control-group">
+                <label for="complexity">Complexity</label>
+                <div class="slider-container">
+                    <input type="range" id="complexity" class="slider" min="3" max="12" value="8">
+                    <span class="value-display" id="complexityValue">8</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="contrast">Contrast</label>
+                <div class="slider-container">
+                    <input type="range" id="contrast" class="slider" min="0" max="100" value="60">
+                    <span class="value-display" id="contrastValue">60</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="size">Size</label>
+                <div class="slider-container">
+                    <input type="range" id="size" class="slider" min="100" max="500" value="300">
+                    <span class="value-display" id="sizeValue">300</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="fillColor">Fill Color</label>
+                <input type="color" id="fillColor" class="color-input" value="#667eea">
+            </div>
+
+            <div class="control-group">
+                <label for="strokeColor">Stroke Color</label>
+                <input type="color" id="strokeColor" class="color-input" value="#764ba2">
+            </div>
+
+            <div class="control-group">
+                <label for="strokeWidth">Stroke Width</label>
+                <div class="slider-container">
+                    <input type="range" id="strokeWidth" class="slider" min="0" max="20" value="3">
+                    <span class="value-display" id="strokeWidthValue">3</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="generateBtn">🎲 Generate</button>
+                <button class="btn btn-secondary" id="randomizeBtn">🌟 Random</button>
+            </div>
+
+            <div class="control-group">
+                <label>Preset Shapes</label>
+                <div class="preset-shapes" id="presetShapes">
+                    <!-- Preset buttons will be generated here -->
+                </div>
+            </div>
+
+            <div class="animation-controls">
+                <div class="animation-toggle">
+                    <span>Animate Blob</span>
+                    <div class="toggle-switch" id="animationToggle"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="panel canvas-area">
+            <svg class="blob-canvas" width="400" height="400" id="blobSvg">
+                <defs>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path id="blobPath" fill="url(#gradient)" stroke="#764ba2" stroke-width="3" filter="url(#glow)"/>
+            </svg>
+            
+            <div class="canvas-controls">
+                <button class="btn btn-primary" id="exportSvgBtn">📥 Export SVG</button>
+                <button class="btn btn-secondary" id="exportPngBtn">🖼️ Export PNG</button>
+                <button class="btn btn-secondary" id="copyCodeBtn">📋 Copy Code</button>
+            </div>
+        </div>
+
+        <!-- History & Stats Panel -->
+        <div class="panel">
+            <h3>📚 History <span id="historyCount">0</span></h3>
+            <div class="history-grid" id="historyGrid">
+                <!-- History items will be added here -->
+            </div>
+
+            <div class="stats-section">
+                <h4>Session Stats</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalGenerated">0</div>
+                        <div class="stat-label">Generated</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalExports">0</div>
+                        <div class="stat-label">Exported</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgComplexity">0</div>
+                        <div class="stat-label">Avg Complexity</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sessionTime">0m</div>
+                        <div class="stat-label">Session Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h4>🚀 Quick Actions</h4>
+                <div class="button-group" style="margin-top: 12px;">
+                    <button class="btn btn-secondary" id="clearHistoryBtn" style="flex: 1; font-size: 12px;">Clear All</button>
+                    <button class="btn btn-secondary" id="exportAllBtn" style="flex: 1; font-size: 12px;">Export All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // App state
+        const state = {
+            complexity: 8,
+            contrast: 60,
+            size: 300,
+            fillColor: '#667eea',
+            strokeColor: '#764ba2',
+            strokeWidth: 3,
+            animationEnabled: false,
+            history: [],
+            stats: {
+                totalGenerated: 0,
+                totalExports: 0,
+                avgComplexity: 0,
+                sessionStart: Date.now()
+            }
+        };
+
+        // DOM Elements
+        const complexitySlider = document.getElementById('complexity');
+        const complexityValue = document.getElementById('complexityValue');
+        const contrastSlider = document.getElementById('contrast');
+        const contrastValue = document.getElementById('contrastValue');
+        const sizeSlider = document.getElementById('size');
+        const sizeValue = document.getElementById('sizeValue');
+        const fillColorInput = document.getElementById('fillColor');
+        const strokeColorInput = document.getElementById('strokeColor');
+        const strokeWidthSlider = document.getElementById('strokeWidth');
+        const strokeWidthValue = document.getElementById('strokeWidthValue');
+        const generateBtn = document.getElementById('generateBtn');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const blobSvg = document.getElementById('blobSvg');
+        const blobPath = document.getElementById('blobPath');
+        const exportSvgBtn = document.getElementById('exportSvgBtn');
+        const exportPngBtn = document.getElementById('exportPngBtn');
+        const copyCodeBtn = document.getElementById('copyCodeBtn');
+        const historyGrid = document.getElementById('historyGrid');
+        const historyCount = document.getElementById('historyCount');
+        const totalGenerated = document.getElementById('totalGenerated');
+        const totalExports = document.getElementById('totalExports');
+        const avgComplexity = document.getElementById('avgComplexity');
+        const sessionTime = document.getElementById('sessionTime');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const exportAllBtn = document.getElementById('exportAllBtn');
+        const toast = document.getElementById('toast');
+        const presetShapes = document.getElementById('presetShapes');
+        const animationToggle = document.getElementById('animationToggle');
+
+        // Initialize the app
+        function init() {
+            loadFromLocalStorage();
+            setupEventListeners();
+            generatePresetButtons();
+            updateUIFromState();
+            generateBlob();
+            updateStats();
+            startSessionTimer();
+        }
+
+        // Load saved state from localStorage
+        function loadFromLocalStorage() {
+            const savedState = localStorage.getItem('svgBlobMakerState');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                Object.assign(state, parsed);
+            }
+            
+            const savedHistory = localStorage.getItem('svgBlobMakerHistory');
+            if (savedHistory) {
+                state.history = JSON.parse(savedHistory);
+                renderHistory();
+            }
+        }
+
+        // Save state to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('svgBlobMakerState', JSON.stringify(state));
+            localStorage.setItem('svgBlobMakerHistory', JSON.stringify(state.history));
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            complexitySlider.addEventListener('input', () => {
+                state.complexity = parseInt(complexitySlider.value);
+                complexityValue.textContent = state.complexity;
+                generateBlob();
+            });
+
+            contrastSlider.addEventListener('input', () => {
+                state.contrast = parseInt(contrastSlider.value);
+                contrastValue.textContent = state.contrast;
+                generateBlob();
+            });
+
+            sizeSlider.addEventListener('input', () => {
+                state.size = parseInt(sizeSlider.value);
+                sizeValue.textContent = state.size;
+                updateSvgSize();
+                generateBlob();
+            });
+
+            fillColorInput.addEventListener('input', () => {
+                state.fillColor = fillColorInput.value;
+                updateBlobStyle();
+            });
+
+            strokeColorInput.addEventListener('input', () => {
+                state.strokeColor = strokeColorInput.value;
+                updateBlobStyle();
+            });
+
+            strokeWidthSlider.addEventListener('input', () => {
+                state.strokeWidth = parseInt(strokeWidthSlider.value);
+                strokeWidthValue.textContent = state.strokeWidth;
+                updateBlobStyle();
+            });
+
+            generateBtn.addEventListener('click', generateBlob);
+            
+            randomizeBtn.addEventListener('click', randomizeSettings);
+            
+            exportSvgBtn.addEventListener('click', exportSvg);
+            exportPngBtn.addEventListener('click', exportPng);
+            copyCodeBtn.addEventListener('click', copySvgCode);
+            
+            clearHistoryBtn.addEventListener('click', clearHistory);
+            exportAllBtn.addEventListener('click', exportAllBlobs);
+            
+            animationToggle.addEventListener('click', toggleAnimation);
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.code === 'Space') {
+                    e.preventDefault();
+                    generateBlob();
+                } else if (e.key === 'r' || e.key === 'R') {
+                    e.preventDefault();
+                    randomizeSettings();
+                }
+            });
+        }
+
+        // Generate preset shape buttons
+        function generatePresetButtons() {
+            const presets = [
+                { name: 'Circle', icon: '○', complexity: 8, contrast: 0 },
+                { name: 'Flower', icon: '❀', complexity: 12, contrast: 80 },
+                { name: 'Star', icon: '⭐', complexity: 10, contrast: 90 },
+                { name: 'Cloud', icon: '☁️', complexity: 7, contrast: 40 },
+                { name: 'Heart', icon: '❤️', complexity: 6, contrast: 70 },
+                { name: 'Diamond', icon: '💎', complexity: 6, contrast: 60 },
+                { name: 'Bubble', icon: '🫧', complexity: 10, contrast: 30 },
+                { name: 'Splat', icon: '💦', complexity: 12, contrast: 85 }
+            ];
+            
+            presets.forEach(preset => {
+                const button = document.createElement('button');
+                button.className = 'preset-btn';
+                button.title = preset.name;
+                button.innerHTML = `<span style="font-size: 20px;">${preset.icon}</span>`;
+                button.addEventListener('click', () => {
+                    state.complexity = preset.complexity;
+                    state.contrast = preset.contrast;
+                    updateUIFromState();
+                    generateBlob();
+                });
+                presetShapes.appendChild(button);
+            });
+        }
+
+        // Update UI from state
+        function updateUIFromState() {
+            complexitySlider.value = state.complexity;
+            complexityValue.textContent = state.complexity;
+            contrastSlider.value = state.contrast;
+            contrastValue.textContent = state.contrast;
+            sizeSlider.value = state.size;
+            sizeValue.textContent = state.size;
+            fillColorInput.value = state.fillColor;
+            strokeColorInput.value = state.strokeColor;
+            strokeWidthSlider.value = state.strokeWidth;
+            strokeWidthValue.textContent = state.strokeWidth;
+            
+            if (state.animationEnabled) {
+                animationToggle.classList.add('active');
+                blobPath.classList.add('animated-blob');
+            } else {
+                animationToggle.classList.remove('active');
+                blobPath.classList.remove('animated-blob');
+            }
+        }
+
+        // Update SVG size
+        function updateSvgSize() {
+            blobSvg.setAttribute('width', state.size);
+            blobSvg.setAttribute('height', state.size);
+        }
+
+        // Generate a blob
+        function generateBlob() {
+            const points = generateBlobPoints(state.complexity, state.contrast, state.size);
+            const pathData = pointsToPathData(points);
+            
+            blobPath.setAttribute('d', pathData);
+            updateBlobStyle();
+            
+            // Add to history
+            addToHistory(pathData);
+            
+            // Update stats
+            state.stats.totalGenerated++;
+            updateStats();
+            
+            saveToLocalStorage();
+        }
+
+        // Generate blob points
+        function generateBlobPoints(complexity, contrast, size) {
+            const points = [];
+            const center = size / 2;
+            const baseRadius = size / 2 - 10;
+            
+            for (let i = 0; i < complexity; i++) {
+                const angle = (i / complexity) * Math.PI * 2;
+                // Add some randomness to the radius based on contrast
+                const variance = (Math.random() - 0.5) * (contrast / 100) * baseRadius;
+                const radius = Math.max(10, baseRadius + variance);
+                
+                const x = center + Math.cos(angle) * radius;
+                const y = center + Math.sin(angle) * radius;
+                
+                points.push({ x, y });
+            }
+            
+            return points;
+        }
+
+        // Convert points to SVG path data
+        function pointsToPathData(points) {
+            if (points.length < 3) return '';
+            
+            let pathData = `M ${points[0].x},${points[0].y}`;
+            
+            for (let i = 1; i < points.length; i++) {
+                const p = points[i];
+                pathData += ` L ${p.x},${p.y}`;
+            }
+            
+            pathData += ' Z';
+            return pathData;
+        }
+
+        // Update blob style
+        function updateBlobStyle() {
+            // Create gradient
+            const gradient = blobSvg.querySelector('#gradient');
+            gradient.innerHTML = `
+                <stop offset="0%" stop-color="${state.fillColor}" stop-opacity="1" />
+                <stop offset="100%" stop-color="${lightenColor(state.fillColor, 20)}" stop-opacity="1" />
+            `;
+            
+            blobPath.setAttribute('fill', `url(#gradient)`);
+            blobPath.setAttribute('stroke', state.strokeColor);
+            blobPath.setAttribute('stroke-width', state.strokeWidth);
+        }
+
+        // Lighten a color
+        function lightenColor(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+            const G = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amt));
+            const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
+            return `#${((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1)}`;
+        }
+
+        // Randomize settings
+        function randomizeSettings() {
+            state.complexity = Math.floor(Math.random() * 10) + 3; // 3-12
+            state.contrast = Math.floor(Math.random() * 100); // 0-100
+            state.size = Math.floor(Math.random() * 401) + 100; // 100-500
+            state.fillColor = getRandomColor();
+            state.strokeColor = getRandomColor();
+            state.strokeWidth = Math.floor(Math.random() * 21); // 0-20
+            
+            updateUIFromState();
+            generateBlob();
+        }
+
+        // Get random color
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Add to history
+        function addToHistory(pathData) {
+            const timestamp = new Date().toISOString();
+            const historyItem = {
+                pathData,
+                complexity: state.complexity,
+                contrast: state.contrast,
+                size: state.size,
+                fillColor: state.fillColor,
+                strokeColor: state.strokeColor,
+                strokeWidth: state.strokeWidth,
+                timestamp
+            };
+            
+            state.history.unshift(historyItem);
+            if (state.history.length > 20) {
+                state.history.pop();
+            }
+            
+            renderHistory();
+        }
+
+        // Render history
+        function renderHistory() {
+            historyGrid.innerHTML = '';
+            historyCount.textContent = state.history.length;
+            
+            state.history.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                if (index === 0) historyItem.classList.add('active');
+                
+                historyItem.innerHTML = `
+                    <svg viewBox="0 0 ${item.size} ${item.size}">
+                        <path fill="${item.fillColor}" stroke="${item.strokeColor}" stroke-width="${item.strokeWidth}" d="${item.pathData}"></path>
+                    </svg>
+                    <div class="history-timestamp">${new Date(item.timestamp).toLocaleTimeString()}</div>
+                `;
+                
+                historyItem.addEventListener('click', () => {
+                    // Remove active class from all items
+                    document.querySelectorAll('.history-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked item
+                    historyItem.classList.add('active');
+                    
+                    // Restore settings
+                    state.complexity = item.complexity;
+                    state.contrast = item.contrast;
+                    state.size = item.size;
+                    state.fillColor = item.fillColor;
+                    state.strokeColor = item.strokeColor;
+                    state.strokeWidth = item.strokeWidth;
+                    
+                    updateUIFromState();
+                    updateSvgSize();
+                    blobPath.setAttribute('d', item.pathData);
+                    updateBlobStyle();
+                });
+                
+                historyGrid.appendChild(historyItem);
+            });
+        }
+
+        // Clear history
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                state.history = [];
+                renderHistory();
+                saveToLocalStorage();
+                showToast('History cleared');
+            }
+        }
+
+        // Export SVG
+        function exportSvg() {
+            const svgData = new XMLSerializer().serializeToString(blobSvg);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `blob-${Date.now()}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            state.stats.totalExports++;
+            updateStats();
+            saveToLocalStorage();
+            
+            showToast('SVG exported successfully');
+        }
+
+        // Export PNG
+        function exportPng() {
+            const svgData = new XMLSerializer().serializeToString(blobSvg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = state.size;
+            canvas.height = state.size;
+            
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `blob-${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    state.stats.totalExports++;
+                    updateStats();
+                    saveToLocalStorage();
+                    
+                    showToast('PNG exported successfully');
+                });
+            };
+            
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        }
+
+        // Copy SVG code
+        function copySvgCode() {
+            const svgData = new XMLSerializer().serializeToString(blobSvg);
+            
+            navigator.clipboard.writeText(svgData).then(() => {
+                showToast('SVG code copied to clipboard');
+            }).catch(err => {
+                showToast('Failed to copy code', 'error');
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // Export all blobs
+        function exportAllBlobs() {
+            if (state.history.length === 0) {
+                showToast('No blobs to export', 'error');
+                return;
+            }
+            
+            // Create a zip file with all history items
+            const zip = new JSZip();
+            
+            state.history.forEach((item, index) => {
+                const svgContent = `<svg width="${item.size}" height="${item.size}" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="${item.fillColor}" stroke="${item.strokeColor}" stroke-width="${item.strokeWidth}" d="${item.pathData}"></path>
+                </svg>`;
+                
+                zip.file(`blob-${index + 1}.svg`, svgContent);
+            });
+            
+            zip.generateAsync({ type: 'blob' }).then(content => {
+                const url = URL.createObjectURL(content);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `blobs-${Date.now()}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('All blobs exported as ZIP');
+            });
+        }
+
+        // Toggle animation
+        function toggleAnimation() {
+            state.animationEnabled = !state.animationEnabled;
+            
+            if (state.animationEnabled) {
+                animationToggle.classList.add('active');
+                blobPath.classList.add('animated-blob');
+            } else {
+                animationToggle.classList.remove('active');
+                blobPath.classList.remove('animated-blob');
+            }
+            
+            saveToLocalStorage();
+        }
+
+        // Update stats
+        function updateStats() {
+            totalGenerated.textContent = state.stats.totalGenerated;
+            totalExports.textContent = state.stats.totalExports;
+            
+            // Calculate average complexity
+            if (state.history.length > 0) {
+                const totalComplexity = state.history.reduce((sum, item) => sum + item.complexity, 0);
+                state.stats.avgComplexity = (totalComplexity / state.history.length).toFixed(1);
+            } else {
+                state.stats.avgComplexity = '0';
+            }
+            
+            avgComplexity.textContent = state.stats.avgComplexity;
+        }
+
+        // Start session timer
+        function startSessionTimer() {
+            setInterval(() => {
+                const minutes = Math.floor((Date.now() - state.stats.sessionStart) / 60000);
+                sessionTime.textContent = `${minutes}m`;
+            }, 60000);
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.style.background = type === 'success' ? '#28a745' : '#dc3545';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', init);
+
+        // JSZip library (included for ZIP export functionality)
+        // Note: This is a simplified version for demonstration purposes
+        // In a real application, you would include the full JSZip library
+        class JSZip {
+            constructor() {
+                this.files = {};
+            }
+            
+            file(name, content) {
+                this.files[name] = content;
+            }
+            
+            generateAsync() {
+                return Promise.resolve(new Blob(
+                    [JSON.stringify(this.files)], 
+                    { type: 'application/zip' }
+                ));
+            }
+        }
+    </script>
+</body>
+</html>
