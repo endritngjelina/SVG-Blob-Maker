@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Blob Maker Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 16px;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            grid-gap: 24px;
+            min-height: 100vh;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-hint {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 12px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .slider:hover {
+            background: #d1d5db;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 122, 255, 0.3);
+            transition: var(--transition);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 12px rgba(0, 122, 255, 0.4);
+        }
+
+        .value-display {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .color-input:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .blob-canvas {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .canvas-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .canvas-controls .btn {
+            flex: unset;
+            min-width: 140px;
+        }
+
+        .history-panel .panel-header {
+            margin-bottom: 16px;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .history-item {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
+        }
+
+        .history-item.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .history-item svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .history-timestamp {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 4px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .history-item:hover .history-timestamp {
+            opacity: 1;
+        }
+
+        .stats-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .export-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 12px;
+            border: 1px solid #f59e0b;
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .toast.warning {
+            background: var(--warning);
+        }
+
+        .preset-shapes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .preset-btn {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover {
+            border-color: var(--primary);
+            background: #f0f8ff;
+            transform: translateY(-2px);
+        }
+
+        .preset-btn svg {
+            width: 100%;
+            height: 30px;
+        }
+
+        .animation-controls {
+            margin-top: 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border-radius: 12px;
+        }
+
+        .animation-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--success);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        .animation-sliders {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .color-swatch {
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+
+        .control-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .control-actions .btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 320px 1fr;
+            }
+            
+            .history-panel {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-panel {
+                grid-column: span 1;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes morphBlob {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+            25% { 
+                transform: scale(1.05) rotate(1deg);
+                border-radius: 50% 60% 70% 40% / 60% 50% 50% 60%;
+            }
+            50% { 
+                transform: scale(0.95) rotate(-1deg);
+                border-radius: 40% 60% 70% 30% / 70% 40% 60% 30%;
+            }
+            75% { 
+                transform: scale(1.02) rotate(0.5deg);
+                border-radius: 70% 40% 50% 50% / 40% 60% 50% 60%;
+            }
+        }
+
+        .animated-blob {
+            animation: morphBlob 7s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .help-icon {
+            color: #9ca3af;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .help-icon:hover {
+            color: var(--primary);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: #f3f4f6;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .shortcut-key {
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .blob-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .preview-container {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .export-option {
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .export-option:hover {
+            background: #f3f4f6;
+            transform: translateY(-2px);
+        }
+
+        .export-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .export-option span {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Controls Panel -->
+        <div class="panel controls-panel">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-sliders-h"></i> Blob Controls</h2>
+                <div class="help-icon" id="helpBtn">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="shape">Shape</div>
+                    <div class="tab" data-tab="color">Color</div>
+                    <div class="tab" data-tab="effects">Effects</div>
+                </div>
+                
+                <div class="tab-content active" id="shape-tab">
+                    <div class="control-group">
+                        <label for="complexity" class="control-label">
+                            <span>Complexity <span class="control-hint">(points)</span></span>
+                            <span class="value-display" id="complexityValue">8</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="complexity" class="slider" min="3" max="20" value="8">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="contrast" class="control-label">
+                            <span>Contrast <span class="control-hint">(variation)</span></span>
+                            <span class="value-display" id="contrastValue">60</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="contrast" class="slider" min="0" max="100" value="60">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="smoothness" class="control-label">
+                            <span>Smoothness <span class="control-hint">(curve)</span></span>
+                            <span class="value-display" id="smoothnessValue">50</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="smoothness" class="slider" min="0" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Preset Shapes</label>
+                        <div class="preset-shapes" id="presetShapes">
+                            <!-- Preset buttons will be generated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="color-tab">
+                    <div class="control-group">
+                        <label for="fillColor">Fill Color</label>
+                        <input type="color" id="fillColor" class="color-input" value="#667eea">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="strokeColor">Stroke Color</label>
+                        <input type="color" id="strokeColor" class="color-input" value="#764ba2">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="strokeWidth">Stroke Width</label>
+                        <div class="slider-container">
+                            <input type="range" id="strokeWidth" class="slider" min="0" max="20" value="3">
+                            <span class="value-display" id="strokeWidthValue">3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Color Palettes</label>
+                        <div class="color-palette">
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #667eea, #764ba2)" data-fill="#667eea" data-stroke="#764ba2"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #f093fb, #f5576c)" data-fill="#f093fb" data-stroke="#f5576c"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #4facfe, #00f2fe)" data-fill="#4facfe" data-stroke="#00f2fe"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #43e97b, #38f9d7)" data-fill="#43e97b" data-stroke="#38f9d7"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #fa709a, #fee140)" data-fill="#fa709a" data-stroke="#fee140"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #30cfd0, #330867)" data-fill="#30cfd0" data-stroke="#330867"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #a8edea, #fed6e3)" data-fill="#a8edea" data-stroke="#fed6e3"></div>
+                            <div class="color-swatch" style="background: linear-gradient(135deg, #5ee7df, #b490ca)" data-fill="#5ee7df" data-stroke="#b490ca"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="effects-tab">
+                    <div class="control-group">
+                        <label for="size">Size</label>
+                        <div class="slider-container">
+                            <input type="range" id="size" class="slider" min="100" max="600" value="400">
+                            <span class="value-display" id="sizeValue">400</span>
+                        </div>
+                    </div>
+                    
+                    <div class="animation-controls">
+                        <div class="animation-toggle">
+                            <span>Animation</span>
+                            <div class="toggle-switch" id="animationToggle"></div>
+                        </div>
+                        
+                        <div class="animation-sliders" id="animationSliders">
+                            <div class="control-group">
+                                <label for="animationSpeed" class="control-label">
+                                    <span>Speed</span>
+                                    <span class="value-display" id="animationSpeedValue">5</span>
+                                </label>
+                                <div class="slider-container">
+                                    <input type="range" id="animationSpeed" class="slider" min="1" max="10" value="5">
+                                </div>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label for="animationIntensity" class="control-label">
+                                    <span>Intensity</span>
+                                    <span class="value-display" id="animationIntensityValue">5</span>
+                                </label>
+                                <div class="slider-container">
+                                    <input type="range" id="animationIntensity" class="slider" min="1" max="10" value="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Effects</label>
+                        <div class="button-group">
+                            <button class="btn btn-secondary" id="addShadowBtn">
+                                <i class="fas fa-circle"></i> Shadow
+                            </button>
+                            <button class="btn btn-secondary" id="addGlowBtn">
+                                <i class="fas fa-sun"></i> Glow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="generateBtn">
+                    <i class="fas fa-dice"></i> Generate
+                </button>
+                <button class="btn btn-secondary" id="randomizeBtn">
+                    <i class="fas fa-random"></i> Random
+                </button>
+            </div>
+            
+            <div class="control-actions">
+                <button class="btn btn-success" id="savePresetBtn">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn btn-warning" id="importBtn">
+                    <i class="fas fa-file-import"></i> Import
+                </button>
+                <button class="btn btn-danger" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="panel canvas-area">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-paint-brush"></i> Blob Preview</h2>
+                <div class="help-icon" id="canvasHelpBtn">
+                    <i class="fas fa-expand"></i>
+                </div>
+            </div>
+            
+            <svg class="blob-canvas" width="400" height="400" id="blobSvg">
+                <defs>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    <filter id="shadow">
+                        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
+                    </filter>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path id="blobPath" fill="url(#gradient)" stroke="#764ba2" stroke-width="3"/>
+            </svg>
+            
+            <div class="canvas-controls">
+                <button class="btn btn-primary" id="exportSvgBtn">
+                    <i class="fas fa-download"></i> SVG
+                </button>
+                <button class="btn btn-primary" id="exportPngBtn">
+                    <i class="fas fa-download"></i> PNG
+                </button>
+                <button class="btn btn-primary" id="exportJpgBtn">
+                    <i class="fas fa-download"></i> JPG
+                </button>
+                <button class="btn btn-secondary" id="copyCodeBtn">
+                    <i class="fas fa-copy"></i> Code
+                </button>
+                <button class="btn btn-secondary" id="shareBtn">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+            </div>
+            
+            <div class="blob-preview">
+                <div class="preview-container">
+                    <svg width="100%" height="100%" viewBox="0 0 400 400">
+                        <use href="#blobPath" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- History & Stats Panel -->
+        <div class="panel history-panel">
+            <div class="panel-header">
+                <h3 class="panel-title"><i class="fas fa-history"></i> History <span id="historyCount">0</span></h3>
+                <div class="help-icon" id="historyHelpBtn">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+            <div class="history-grid" id="historyGrid">
+                <!-- History items will be added here -->
+            </div>
+
+            <div class="stats-section">
+                <h4 style="margin-bottom: 16px; color: #333; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-line"></i> Session Stats
+                </h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalGenerated">0</div>
+                        <div class="stat-label">Generated</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalExports">0</div>
+                        <div class="stat-label">Exported</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgComplexity">0</div>
+                        <div class="stat-label">Avg Complexity</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sessionTime">0m</div>
+                        <div class="stat-label">Session Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h4 style="margin-bottom: 16px; color: #333; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h4>
+                <div class="export-options">
+                    <div class="export-option" id="exportAllBtn">
+                        <i class="fas fa-file-archive"></i>
+                        <span>Export All</span>
+                    </div>
+                    <div class="export-option" id="clearHistoryBtn">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear History</span>
+                    </div>
+                    <div class="export-option" id="saveProjectBtn">
+                        <i class="fas fa-save"></i>
+                        <span>Save Project</span>
+                    </div>
+                    <div class="export-option" id="loadProjectBtn">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Load Project</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Help & Shortcuts</h3>
+                <div class="modal-close" id="closeHelpModal">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            
+            <div class="shortcut-item">
+                <span>Generate new blob</span>
+                <span class="shortcut-key">Space</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Randomize settings</span>
+                <span class="shortcut-key">Ctrl + R</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Export as SVG</span>
+                <span class="shortcut-key">Ctrl + S</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Export as PNG</span>
+                <span class="shortcut-key">Ctrl + P</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Copy SVG code</span>
+                <span class="shortcut-key">Ctrl + C</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Toggle animation</span>
+                <span class="shortcut-key">Ctrl + A</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BlobMakerPro {
+            constructor() {
+                this.history = JSON.parse(localStorage.getItem('blobHistory') || '[]');
+                this.stats = JSON.parse(localStorage.getItem('blobStats') || '{"totalGenerated": 0, "totalExports": 0, "complexitySum": 0, "sessionStart": ' + Date.now() + '}');
+                this.currentBlobIndex = -1;
+                this.animationEnabled = false;
+                this.animationSpeed = 5;
+                this.animationIntensity = 5;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.generatePresetShapes();
+                this.generateBlob();
+                this.updateHistory();
+                this.updateStats();
+                this.startSessionTimer();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    complexity: document.getElementById('complexity'),
+                    contrast: document.getElementById('contrast'),
+                    smoothness: document.getElementById('smoothness'),
+                    size: document.getElementById('size'),
+                    fillColor: document.getElementById('fillColor'),
+                    strokeColor: document.getElementById('strokeColor'),
+                    strokeWidth: document.getElementById('strokeWidth'),
+                    generateBtn: document.getElementById('generateBtn'),
+                    randomizeBtn: document.getElementById('randomizeBtn'),
+                    blobSvg: document.getElementById('blobSvg'),
+                    blobPath: document.getElementById('blobPath'),
+                    historyGrid: document.getElementById('historyGrid'),
+                    exportSvgBtn: document.getElementById('exportSvgBtn'),
+                    exportPngBtn: document.getElementById('exportPngBtn'),
+                    exportJpgBtn: document.getElementById('exportJpgBtn'),
+                    copyCodeBtn: document.getElementById('copyCodeBtn'),
+                    shareBtn: document.getElementById('shareBtn'),
+                    toast: document.getElementById('toast'),
+                    presetShapes: document.getElementById('presetShapes'),
+                    animationToggle: document.getElementById('animationToggle'),
+                    animationSpeed: document.getElementById('animationSpeed'),
+                    animationIntensity: document.getElementById('animationIntensity'),
+                    animationSliders: document.getElementById('animationSliders'),
+                    clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+                    exportAllBtn: document.getElementById('exportAllBtn'),
+                    savePresetBtn: document.getElementById('savePresetBtn'),
+                    resetBtn: document.getElementById('resetBtn'),
+                    addShadowBtn: document.getElementById('addShadowBtn'),
+                    addGlowBtn: document.getElementById('addGlowBtn'),
+                    helpBtn: document.getElementById('helpBtn'),
+                    helpModal: document.getElementById('helpModal'),
+                    closeHelpModal: document.getElementById('closeHelpModal'),
+                    tabs: document.querySelectorAll('.tab'),
+                    tabContents: document.querySelectorAll('.tab-content'),
+                    colorSwatches: document.querySelectorAll('.color-swatch')
+                };
+                
+                // Initialize animation sliders as hidden
+                this.elements.animationSliders.style.display = 'none';
+            }
+
+            bindEvents() {
+                // Slider events with real-time updates
+                ['complexity', 'contrast', 'smoothness', 'size', 'strokeWidth', 'animationSpeed', 'animationIntensity'].forEach(id => {
+                    const element = document.getElementById(id);
+                    const valueDisplay = document.getElementById(id + 'Value');
+                    
+                    if (element && valueDisplay) {
+                        element.addEventListener('input', (e) => {
+                            valueDisplay.textContent = e.target.value;
+                            if (['complexity', 'contrast', 'smoothness', 'strokeWidth'].includes(id)) {
+                                this.generateBlob();
+                            } else if (id === 'size') {
+                                this.updateBlobSize();
+                            } else if (id === 'animationSpeed') {
+                                this.animationSpeed = e.target.value;
+                                this.updateAnimation();
+                            } else if (id === 'animationIntensity') {
+                                this.animationIntensity = e.target.value;
+                                this.updateAnimation();
+                            }
+                        });
+                    }
+                });
+
+                // Color events
+                this.elements.fillColor.addEventListener('change', () => this.updateBlobColors());
+                this.elements.strokeColor.addEventListener('change', () => this.updateBlobColors());
+                
+                // Color swatches
+                this.elements.colorSwatches.forEach(swatch => {
+                    swatch.addEventListener('click', () => {
+                        const fillColor = swatch.getAttribute('data-fill');
+                        const strokeColor = swatch.getAttribute('data-stroke');
+                        
+                        this.elements.fillColor.value = fillColor;
+                        this.elements.strokeColor.value = strokeColor;
+                        
+                        this.updateBlobColors();
+                        this.showToast('🎨 Color palette applied!');
+                    });
+                });
+
+                // Button events
+                this.elements.generateBtn.addEventListener('click', () => this.generateBlob());
+                this.elements.randomizeBtn.addEventListener('click', () => this.randomizeSettings());
+                this.elements.exportSvgBtn.addEventListener('click', () => this.exportSVG());
+                this.elements.exportPngBtn.addEventListener('click', () => this.exportPNG());
+                this.elements.exportJpgBtn.addEventListener('click', () => this.exportJPG());
+                this.elements.copyCodeBtn.addEventListener('click', () => this.copyCode());
+                this.elements.shareBtn.addEventListener('click', () => this.shareBlob());
+                this.elements.animationToggle.addEventListener('click', () => this.toggleAnimation());
+                this.elements.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+                this.elements.exportAllBtn.addEventListener('click', () => this.exportAll());
+                this.elements.savePresetBtn.addEventListener('click', () => this.savePreset());
+                this.elements.resetBtn.addEventListener('click', () => this.resetSettings());
+                this.elements.addShadowBtn.addEventListener('click', () => this.toggleEffect('shadow'));
+                this.elements.addGlowBtn.addEventListener('click', () => this.toggleEffect('glow'));
+                this.elements.helpBtn.addEventListener('click', () => this.showHelpModal());
+                this.elements.closeHelpModal.addEventListener('click', () => this.hideHelpModal());
+                
+                // Tab events
+                this.elements.tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.getAttribute('data-tab');
+                        
+                        // Remove active class from all tabs and contents
+                        this.elements.tabs.forEach(t => t.classList.remove('active'));
+                        this.elements.tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to clicked tab and corresponding content
+                        tab.classList.add('active');
+                        document.getElementById(`${tabId}-tab`).classList.add('active');
+                    });
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key) {
+                            case 'g':
+                                e.preventDefault();
+                                this.generateBlob();
+                                break;
+                            case 'r':
+                                e.preventDefault();
+                                this.randomizeSettings();
+                                break;
+                            case 's':
+                                e.preventDefault();
+                                this.exportSVG();
+                                break;
+                            case 'p':
+                                e.preventDefault();
+                                this.exportPNG();
+                                break;
+                            case 'c':
+                                e.preventDefault();
+                                this.copyCode();
+                                break;
+                            case 'a':
+                                e.preventDefault();
+                                this.toggleAnimation();
+                                break;
+                        }
+                    } else if (e.key === ' ') {
+                        e.preventDefault();
+                        this.generateBlob();
+                    }
+                });
+                
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target === this.elements.helpModal) {
+                        this.hideHelpModal();
+                    }
+                });
+            }
+
+            createBlobPath(complexity, contrast, smoothness) {
+                const centerX = 200;
+                const centerY = 200;
+                const baseRadius = 80;
+                const smoothFactor = smoothness / 100;
+                
+                const points = [];
+                for (let i = 0; i < complexity; i++) {
+                    const angle = (i / complexity) * Math.PI * 2;
+                    const radiusVariation = (Math.random() - 0.5) * (contrast / 100) * baseRadius;
+                    const radius = baseRadius + radiusVariation;
+                    
+                    points.push({
+                        x: centerX + Math.cos(angle) * radius,
+                        y: centerY + Math.sin(angle) * radius,
+                        angle: angle
+                    });
+                }
+
+                // Create smooth curved path using cubic Bezier curves
+                let path = `M ${points[0].x} ${points[0].y}`;
+                
+                for (let i = 0; i < points.length; i++) {
+                    const current = points[i];
+                    const next = points[(i + 1) % points.length];
+                    
+                    const controlDistance = baseRadius * 0.25 * smoothFactor;
+                    const cp1x = current.x + Math.cos(current.angle + Math.PI/2) * controlDistance;
+                    const cp1y = current.y + Math.sin(current.angle + Math.PI/2) * controlDistance;
+                    const cp2x = next.x + Math.cos(next.angle - Math.PI/2) * controlDistance;
+                    const cp2y = next.y + Math.sin(next.angle - Math.PI/2) * controlDistance;
+                    
+                    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                }
+                
+                return path + ' Z';
+            }
+
+            generateBlob() {
+                const complexity = parseInt(this.elements.complexity.value);
+                const contrast = parseInt(this.elements.contrast.value);
+                const smoothness = parseInt(this.elements.smoothness.value);
+                
+                const path = this.createBlobPath(complexity, contrast, smoothness);
+                this.elements.blobPath.setAttribute('d', path);
+                
+                this.updateBlobColors();
+                this.updateBlobSize();
+                
+                // Save to history
+                this.saveToHistory({
+                    path: path,
+                    fillColor: this.elements.fillColor.value,
+                    strokeColor: this.elements.strokeColor.value,
+                    strokeWidth: this.elements.strokeWidth.value,
+                    complexity: complexity,
+                    contrast: contrast,
+                    smoothness: smoothness,
+                    size: this.elements.size.value,
+                    timestamp: Date.now()
+                });
+
+                this.stats.totalGenerated++;
+                this.stats.complexitySum += complexity;
+                this.saveStats();
+                this.updateStats();
+            }
+
+            updateBlobColors() {
+                const fillColor = this.elements.fillColor.value;
+                const strokeColor = this.elements.strokeColor.value;
+                const strokeWidth = this.elements.strokeWidth.value;
+                
+                // Update gradient
+                const gradient = document.getElementById('gradient');
+                const stops = gradient.querySelectorAll('stop');
+                stops[0].style.stopColor = fillColor;
+                stops[1].style.stopColor = strokeColor;
+                
+                this.elements.blobPath.setAttribute('stroke', strokeColor);
+                this.elements.blobPath.setAttribute('stroke-width', strokeWidth);
+            }
+
+            updateBlobSize() {
+                const size = parseInt(this.elements.size.value);
+                this.elements.blobSvg.setAttribute('width', size);
+                this.elements.blobSvg.setAttribute('height', size);
+                
+                // Scale the viewBox to maintain aspect ratio
+                this.elements.blobSvg.setAttribute('viewBox', `0 0 400 400`);
+            }
+
+            updateAnimation() {
+                if (this.animationEnabled) {
+                    const duration = 11 - this.animationSpeed; // Invert so higher = faster
+                    const scale = 1 + (this.animationIntensity / 20);
+                    
+                    document.documentElement.style.setProperty('--animation-duration', `${duration}s`);
+                    document.documentElement.style.setProperty('--animation-scale', scale);
+                }
+            }
+
+            randomizeSettings() {
+                this.elements.complexity.value = Math.floor(Math.random() * 15) + 3;
+                this.elements.contrast.value = Math.floor(Math.random() * 80) + 20;
+                this.elements.smoothness.value = Math.floor(Math.random() * 100);
+                this.elements.size.value = Math.floor(Math.random() * 400) + 200;
+                this.elements.strokeWidth.value = Math.floor(Math.random() * 15) + 1;
+                
+                // Random colors
+                this.elements.fillColor.value = this.getRandomColor();
+                this.elements.strokeColor.value = this.getRandomColor();
+                
+                // Update value displays
+                document.getElementById('complexityValue').textContent = this.elements.complexity.value;
+                document.getElementById('contrastValue').textContent = this.elements.contrast.value;
+                document.getElementById('smoothnessValue').textContent = this.elements.smoothness.value;
+                document.getElementById('sizeValue').textContent = this.elements.size.value;
+                document.getElementById('strokeWidthValue').textContent = this.elements.strokeWidth.value;
+                
+                this.generateBlob();
+                this.showToast('🎲 Settings randomized!');
+            }
+
+            getRandomColor() {
+                const hue = Math.floor(Math.random() * 360);
+                return `hsl(${hue}, 70%, 60%)`;
+            }
+
+            saveToHistory(blobData) {
+                this.history.unshift(blobData);
+                if (this.history.length > 50) { // Limit history to 50 items
+                    this.history.pop();
+                }
+                localStorage.setItem('blobHistory', JSON.stringify(this.history));
+                this.updateHistory();
+            }
+
+            updateHistory() {
+                this.elements.historyGrid.innerHTML = '';
+                document.getElementById('historyCount').textContent = this.history.length;
+                
+                this.history.forEach((blob, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    if (index === this.currentBlobIndex) {
+                        historyItem.classList.add('active');
+                    }
+                    
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('viewBox', '0 0 400 400');
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', blob.path);
+                    path.setAttribute('fill', blob.fillColor);
+                    path.setAttribute('stroke', blob.strokeColor);
+                    path.setAttribute('stroke-width', blob.strokeWidth);
+                    
+                    svg.appendChild(path);
+                    historyItem.appendChild(svg);
+                    
+                    const timestamp = document.createElement('div');
+                    timestamp.className = 'history-timestamp';
+                    timestamp.textContent = new Date(blob.timestamp).toLocaleTimeString();
+                    historyItem.appendChild(timestamp);
+                    
+                    historyItem.addEventListener('click', () => this.loadFromHistory(index));
+                    this.elements.historyGrid.appendChild(historyItem);
+                });
+            }
+
+            loadFromHistory(index) {
+                const blob = this.history[index];
+                this.currentBlobIndex = index;
+                
+                this.elements.complexity.value = blob.complexity;
+                this.elements.contrast.value = blob.contrast;
+                this.elements.smoothness.value = blob.smoothness || 50;
+                this.elements.size.value = blob.size;
+                this.elements.fillColor.value = blob.fillColor;
+                this.elements.strokeColor.value = blob.strokeColor;
+                this.elements.strokeWidth.value = blob.strokeWidth;
+                
+                // Update value displays
+                document.getElementById('complexityValue').textContent = blob.complexity;
+                document.getElementById('contrastValue').textContent = blob.contrast;
+                document.getElementById('smoothnessValue').textContent = blob.smoothness || 50;
+                document.getElementById('sizeValue').textContent = blob.size;
+                document.getElementById('strokeWidthValue').textContent = blob.strokeWidth;
+                
+                this.elements.blobPath.setAttribute('d', blob.path);
+                this.updateBlobColors();
+                this.updateBlobSize();
+                this.updateHistory();
+            }
+
+            generatePresetShapes() {
+                const presets = [
+                    { name: 'Smooth', complexity: 6, contrast: 30, smoothness: 80 },
+                    { name: 'Sharp', complexity: 8, contrast: 80, smoothness: 20 },
+                    { name: 'Simple', complexity: 4, contrast: 50, smoothness: 60 },
+                    { name: 'Complex', complexity: 12, contrast: 70, smoothness: 40 },
+                    { name: 'Organic', complexity: 7, contrast: 45, smoothness: 70 },
+                    { name: 'Angular', complexity: 5, contrast: 85, smoothness: 10 },
+                    { name: 'Fluid', complexity: 9, contrast: 25, smoothness: 90 },
+                    { name: 'Chaotic', complexity: 11, contrast: 95, smoothness: 30 }
+                ];
+
+                this.elements.presetShapes.innerHTML = '';
+                
+                presets.forEach(preset => {
+                    const btn = document.createElement('div');
+                    btn.className = 'preset-btn';
+                    btn.title = preset.name;
+                    
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('viewBox', '0 0 100 100');
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const previewPath = this.createBlobPath(preset.complexity, preset.contrast, preset.smoothness, 50, 50, 20);
+                    path.setAttribute('d', previewPath);
+                    path.setAttribute('fill', '#007aff');
+                    path.setAttribute('stroke', 'none');
+                    
+                    svg.appendChild(path);
+                    btn.appendChild(svg);
+                    
+                    btn.addEventListener('click', () => {
+                        this.elements.complexity.value = preset.complexity;
+                        this.elements.contrast.value = preset.contrast;
+                        this.elements.smoothness.value = preset.smoothness;
+                        document.getElementById('complexityValue').textContent = preset.complexity;
+                        document.getElementById('contrastValue').textContent = preset.contrast;
+                        document.getElementById('smoothnessValue').textContent = preset.smoothness;
+                        this.generateBlob();
+                        this.showToast(`🎨 Applied ${preset.name} preset!`);
+                    });
+                    
+                    this.elements.presetShapes.appendChild(btn);
+                });
+            }
+
+            toggleAnimation() {
+                this.animationEnabled = !this.animationEnabled;
+                this.elements.animationToggle.classList.toggle('active', this.animationEnabled);
+                
+                // Show/hide animation sliders
+                this.elements.animationSliders.style.display = this.animationEnabled ? 'block' : 'none';
+                
+                if (this.animationEnabled) {
+                    this.elements.blobPath.classList.add('animated-blob');
+                    this.updateAnimation();
+                    this.showToast('✨ Animation enabled!');
+                } else {
+                    this.elements.blobPath.classList.remove('animated-blob');
+                    this.showToast('⏹️ Animation disabled!');
+                }
+            }
+            
+            toggleEffect(effect) {
+                const currentFilter = this.elements.blobPath.getAttribute('filter') || '';
+                
+                if (effect === 'shadow') {
+                    if (currentFilter.includes('shadow')) {
+                        this.elements.blobPath.setAttribute('filter', currentFilter.replace('url(#shadow)', '').trim());
+                        this.elements.addShadowBtn.classList.remove('btn-primary');
+                        this.elements.addShadowBtn.classList.add('btn-secondary');
+                        this.showToast('🌑 Shadow removed!');
+                    } else {
+                        this.elements.blobPath.setAttribute('filter', `${currentFilter} url(#shadow)`.trim());
+                        this.elements.addShadowBtn.classList.remove('btn-secondary');
+                        this.elements.addShadowBtn.classList.add('btn-primary');
+                        this.showToast('🌑 Shadow added!');
+                    }
+                } else if (effect === 'glow') {
+                    if (currentFilter.includes('glow')) {
+                        this.elements.blobPath.setAttribute('filter', currentFilter.replace('url(#glow)', '').trim());
+                        this.elements.addGlowBtn.classList.remove('btn-primary');
+                        this.elements.addGlowBtn.classList.add('btn-secondary');
+                        this.showToast('✨ Glow removed!');
+                    } else {
+                        this.elements.blobPath.setAttribute('filter', `${currentFilter} url(#glow)`.trim());
+                        this.elements.addGlowBtn.classList.remove('btn-secondary');
+                        this.elements.addGlowBtn.classList.add('btn-primary');
+                        this.showToast('✨ Glow added!');
+                    }
+                }
+            }
+
+            exportSVG() {
+                const svgData = new XMLSerializer().serializeToString(this.elements.blobSvg);
+                const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `blob-${Date.now()}.svg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.stats.totalExports++;
+                this.saveStats();
+                this.updateStats();
+                this.showToast('📥 SVG exported successfully!');
+            }
+
+            exportPNG() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = parseInt(this.elements.size.value);
+                
+                canvas.width = size;
+                canvas.height = size;
+                
+                const svgData = new XMLSerializer().serializeToString(this.elements.blobSvg);
+                const img = new Image();
+                
+                img.onload = () => {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `blob-${Date.now()}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        this.stats.totalExports++;
+                        this.saveStats();
+                        this.updateStats();
+                        this.showToast('🖼️ PNG exported successfully!');
+                    }, 'image/png');
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            }
+            
+            exportJPG() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const size = parseInt(this.elements.size.value);
+                
+                canvas.width = size;
+                canvas.height = size;
+                
+                const svgData = new XMLSerializer().serializeToString(this.elements.blobSvg);
+                const img = new Image();
+                
+                img.onload = () => {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `blob-${Date.now()}.jpg`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        this.stats.totalExports++;
+                        this.saveStats();
+                        this.updateStats();
+                        this.showToast('🖼️ JPG exported successfully!');
+                    }, 'image/jpeg', 0.9);
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            }
+
+            copyCode() {
+                const svgCode = new XMLSerializer().serializeToString(this.elements.blobSvg);
+                const formattedCode = this.formatSVGCode(svgCode);
+                
+                navigator.clipboard.writeText(formattedCode).then(() => {
+                    this.showToast('📋 SVG code copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    this.showToast('❌ Failed to copy code!', 'error');
+                });
+            }
+            
+            shareBlob() {
+                if (navigator.share) {
+                    const svgData = new XMLSerializer().serializeToString(this.elements.blobSvg);
+                    
+                    // Convert SVG to Blob
+                    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                    const file = new File([blob], 'blob.svg', { type: 'image/svg+xml' });
+                    
+                    navigator.share({
+                        title: 'Check out this SVG blob I made!',
+                        text: 'I created this cool SVG blob using SVG Blob Maker Pro',
+                        files: [file]
+                    }).then(() => {
+                        this.showToast('✅ Blob shared successfully!');
+                    }).catch(error => {
+                        console.error('Error sharing:', error);
+                        this.showToast('❌ Could not share blob', 'error');
+                    });
+                } else {
+                    this.showToast('Web Share API not supported in your browser', 'warning');
+                }
+            }
+
+            formatSVGCode(svgCode) {
+                return svgCode
+                    .replace(/></g, '>\n<')
+                    .replace(/^\s+|\s+$/g, '')
+                    .split('\n')
+                    .map((line, index) => {
+                        const indent = '  '.repeat(Math.max(0, (line.match(/</g) || []).length - (line.match(/\//g) || []).length));
+                        return indent + line.trim();
+                    })
+                    .join('\n');
+            }
+
+            clearHistory() {
+                if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                    this.history = [];
+                    localStorage.removeItem('blobHistory');
+                    this.currentBlobIndex = -1;
+                    this.updateHistory();
+                    this.showToast('🗑️ History cleared!');
+                }
+            }
+
+            exportAll() {
+                if (this.history.length === 0) {
+                    this.showToast('❌ No blobs to export!', 'error');
+                    return;
+                }
+
+                // This would require JSZip library which we don't have in this example
+                // So we'll just export the first one as a demonstration
+                this.exportSVG();
+                this.showToast('📦 Export all functionality would require additional libraries', 'warning');
+            }
+            
+            savePreset() {
+                const preset = {
+                    complexity: parseInt(this.elements.complexity.value),
+                    contrast: parseInt(this.elements.contrast.value),
+                    smoothness: parseInt(this.elements.smoothness.value),
+                    fillColor: this.elements.fillColor.value,
+                    strokeColor: this.elements.strokeColor.value,
+                    strokeWidth: parseInt(this.elements.strokeWidth.value),
+                    size: parseInt(this.elements.size.value),
+                    name: `Preset ${Math.floor(Math.random() * 1000)}`,
+                    timestamp: Date.now()
+                };
+                
+                let presets = JSON.parse(localStorage.getItem('blobPresets') || '[]');
+                presets.push(preset);
+                localStorage.setItem('blobPresets', JSON.stringify(presets));
+                
+                this.showToast('💾 Preset saved successfully!');
+            }
+            
+            resetSettings() {
+                this.elements.complexity.value = 8;
+                this.elements.contrast.value = 60;
+                this.elements.smoothness.value = 50;
+                this.elements.size.value = 400;
+                this.elements.strokeWidth.value = 3;
+                this.elements.fillColor.value = '#667eea';
+                this.elements.strokeColor.value = '#764ba2';
+                
+                // Update value displays
+                document.getElementById('complexityValue').textContent = 8;
+                document.getElementById('contrastValue').textContent = 60;
+                document.getElementById('smoothnessValue').textContent = 50;
+                document.getElementById('sizeValue').textContent = 400;
+                document.getElementById('strokeWidthValue').textContent = 3;
+                
+                this.generateBlob();
+                this.showToast('🔄 Settings reset to default!');
+            }
+            
+            showHelpModal() {
+                this.elements.helpModal.classList.add('active');
+            }
+            
+            hideHelpModal() {
+                this.elements.helpModal.classList.remove('active');
+            }
+
+            saveStats() {
+                localStorage.setItem('blobStats', JSON.stringify(this.stats));
+            }
+
+            updateStats() {
+                document.getElementById('totalGenerated').textContent = this.stats.totalGenerated;
+                document.getElementById('totalExports').textContent = this.stats.totalExports;
+                
+                const avgComplexity = this.stats.totalGenerated > 0 
+                    ? Math.round(this.stats.complexitySum / this.stats.totalGenerated)
+                    : 0;
+                document.getElementById('avgComplexity').textContent = avgComplexity;
+            }
+
+            startSessionTimer() {
+                setInterval(() => {
+                    const sessionTime = Math.floor((Date.now() - this.stats.sessionStart) / 60000);
+                    document.getElementById('sessionTime').textContent = sessionTime + 'm';
+                }, 60000);
+            }
+
+            showToast(message, type = 'success') {
+                this.elements.toast.textContent = message;
+                this.elements.toast.className = 'toast';
+                
+                if (type === 'error') {
+                    this.elements.toast.classList.add('error');
+                } else if (type === 'warning') {
+                    this.elements.toast.classList.add('warning');
+                }
+                
+                this.elements.toast.classList.add('show');
+                setTimeout(() => {
+                    this.elements.toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new BlobMakerPro();
+        });
+    </script>
+</body>
+</html>
