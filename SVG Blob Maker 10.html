@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlobCraft Pro - Advanced SVG Blob Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #2d3748;
+            --light: #f8fafc;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #f56565;
+            --gray-100: #f7fafc;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-400: #cbd5e0;
+            --gray-500: #a0aec0;
+            --gray-600: #718096;
+            --gray-700: #4a5568;
+            --gray-800: #2d3748;
+            --gray-900: #1a202c;
+            --border-radius: 16px;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            color: white;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header-badge {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            background: linear-gradient(45deg, var(--accent), var(--secondary));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 32px;
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .stat-item:not(:last-child):after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 40px;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 32px;
+            margin-bottom: 32px;
+            flex: 1;
+        }
+
+        .workspace {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            border: 1px solid var(--gray-200);
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .controls-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .controls-panel::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: var(--gray-400);
+            border-radius: 3px;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
+        }
+
+        .controls-section {
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .controls-section:not(:last-child):after {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .controls-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-section h3 i {
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-container {
+            position: relative;
+            padding-top: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-300);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            transition: var(--transition);
+        }
+
+        .slider:hover {
+            background: var(--gray-400);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--gradient);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 2px solid white;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--gradient);
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 2px solid white;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -8px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: 10px;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .color-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .color-input-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .color-input:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .color-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            width: 100%;
+            text-align: center;
+        }
+
+        .button {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .button-primary {
+            background: var(--gradient);
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .button-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 2px solid var(--gray-300);
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .button-secondary:hover {
+            background: var(--gray-200);
+            border-color: var(--gray-400);
+            transform: translateY(-1px);
+        }
+
+        .button-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .canvas-area {
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            text-align: center;
+            min-height: 500px;
+            position: relative;
+            border: 2px dashed var(--gray-300);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .canvas-area:hover {
+            border-color: var(--primary);
+            background: var(--gray-200);
+        }
+
+        .blob-svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.1));
+            transition: var(--transition);
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .preset-button {
+            padding: 10px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-300);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .preset-button:hover {
+            background: var(--gray-200);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .preset-button i {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .history-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            margin-top: 32px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gray-200);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 18px;
+            margin-top: 24px;
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .history-item svg {
+            width: 100%;
+            height: 90px;
+        }
+
+        .history-item-info {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        .history-item-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .history-item:hover .history-item-actions {
+            opacity: 1;
+        }
+
+        .history-item-action {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .history-item-action:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .export-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            margin-top: 24px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gray-200);
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease;
+            max-width: 320px;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger);
+        }
+
+        .toast.info .toast-icon {
+            color: var(--primary);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            transition: var(--transition);
+        }
+
+        .toast-close:hover {
+            color: var(--gray-700);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--gray-700);
+        }
+
+        .modal-body {
+            margin-bottom: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-300);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-top: 6px;
+        }
+
+        .advanced-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .advanced-settings {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-200);
+            display: none;
+        }
+
+        .advanced-settings.active {
+            display: block;
+        }
+
+        .key-shortcut {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 6px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            min-width: 20px;
+        }
+
+        /* Animations */
+        @keyframes morphFluid {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 15px 35px rgba(0,0,0,0.15));
+            }
+            25% { 
+                transform: scale(1.05) rotate(1deg);
+                filter: drop-shadow(0 20px 40px rgba(102, 126, 234, 0.2));
+            }
+            50% { 
+                transform: scale(0.95) rotate(-1deg);
+                filter: drop-shadow(0 25px 45px rgba(118, 75, 162, 0.2));
+            }
+            75% { 
+                transform: scale(1.02) rotate(0.5deg);
+                filter: drop-shadow(0 18px 38px rgba(240, 147, 251, 0.2));
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes pulseRing {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animated {
+            animation: morphFluid 6s ease-in-out infinite;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .pulse-ring {
+            animation: pulseRing 2s infinite;
+        }
+
+        .fade-in-scale {
+            animation: fadeInScale 0.3s ease;
+        }
+
+        .micro-interaction {
+            transition: var(--transition);
+        }
+
+        .micro-interaction:active {
+            transform: scale(0.95);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .preset-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .stat-item:not(:last-child):after {
+                display: none;
+            }
+            
+            .export-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .history-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .animation-controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .workspace, .controls-panel, .history-section, .export-section {
+                padding: 20px;
+            }
+            
+            .preset-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .button {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>BlobCraft Pro <span class="header-badge">v2.0</span></h1>
+            <p>Professional SVG Blob Generator with Advanced Features</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="blobCount">0</span>
+                <span class="stat-label">Blobs Created</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalTime">0s</span>
+                <span class="stat-label">Session Time</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="exportCount">0</span>
+                <span class="stat-label">Exports</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="favoriteCount">0</span>
+                <span class="stat-label">Favorites</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="workspace">
+                <div class="canvas-area">
+                    <svg id="blobCanvas" width="500" height="500" viewBox="0 0 500 500">
+                        <defs>
+                            <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                            <filter id="blobShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+                                <feOffset in="blur" dx="5" dy="5" result="offsetBlur"/>
+                                <feFlood flood-color="rgba(0,0,0,0.2)" result="offsetColor"/>
+                                <feComposite in="offsetColor" in2="offsetBlur" operator="in" result="offsetBlur"/>
+                                <feBlend in="SourceGraphic" in2="offsetBlur"/>
+                            </filter>
+                        </defs>
+                        <path id="blobPath" fill="url(#blobGradient)" filter="url(#blobShadow)" transform="translate(250,250)"/>
+                    </svg>
+                </div>
+                
+                <div class="animation-controls">
+                    <button class="button button-secondary" onclick="blobMaker.toggleAnimation()">
+                        <i class="fas fa-play-circle"></i> Toggle Animation
+                    </button>
+                    <button class="button button-secondary" onclick="blobMaker.randomizeBlob()">
+                        <i class="fas fa-random"></i> Random Blob
+                    </button>
+                    <button class="button button-secondary" onclick="blobMaker.resetBlob()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button class="button button-primary" onclick="blobMaker.saveToFavorites()">
+                        <i class="fas fa-heart"></i> Favorite
+                    </button>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="controls-section">
+                    <h3><i class="fas fa-shapes"></i> Shape Controls</h3>
+                    
+                    <div class="control-group">
+                        <label for="complexity">
+                            Complexity
+                            <span class="slider-value" id="complexityValue">6</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="complexity" class="slider" min="3" max="20" value="6">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="irregularity">
+                            Irregularity
+                            <span class="slider-value" id="irregularityValue">50%</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="irregularity" class="slider" min="0" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="size">
+                            Size
+                            <span class="slider-value" id="sizeValue">100</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="size" class="slider" min="50" max="200" value="100">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="roundness">
+                            Roundness
+                            <span class="slider-value" id="roundnessValue">50%</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="roundness" class="slider" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <h3><i class="fas fa-palette"></i> Style Controls</h3>
+                    
+                    <div class="control-group">
+                        <label for="fillColor">Fill Color</label>
+                        <div class="color-group">
+                            <div class="color-input-container">
+                                <input type="color" id="fillColor" class="color-input" value="#667eea">
+                                <div class="color-label">Main</div>
+                            </div>
+                            <div class="color-input-container">
+                                <input type="color" id="fillColor2" class="color-input" value="#764ba2">
+                                <div class="color-label">Secondary</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="gradientType">Gradient Type</label>
+                        <select id="gradientType" class="form-input">
+                            <option value="linear">Linear</option>
+                            <option value="radial">Radial</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="strokeColor">Stroke Color</label>
+                        <input type="color" id="strokeColor" class="color-input" value="#764ba2">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="strokeWidth">
+                            Stroke Width
+                            <span class="slider-value" id="strokeWidthValue">0</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="strokeWidth" class="slider" min="0" max="10" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <h3><i class="fas fa-cog"></i> Advanced Controls</h3>
+                    
+                    <div class="control-group">
+                        <label for="smoothness">
+                            Smoothness
+                            <span class="slider-value" id="smoothnessValue">50%</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="smoothness" class="slider" min="0" max="100" value="50">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="rotation">
+                            Rotation
+                            <span class="slider-value" id="rotationValue">0°</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="rotation" class="slider" min="0" max="360" value="0">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="animationSpeed">
+                            Animation Speed
+                            <span class="slider-value" id="animationSpeedValue">50%</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="animationSpeed" class="slider" min="10" max="200" value="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <h3><i class="fas fa-magic"></i> Quick Presets</h3>
+                    <div class="preset-buttons">
+                        <button class="preset-button" onclick="blobMaker.applyPreset('smooth')">
+                            <i class="fas fa-cloud"></i> Smooth
+                        </button>
+                        <button class="preset-button" onclick="blobMaker.applyPreset('spiky')">
+                            <i class="fas fa-star"></i> Spiky
+                        </button>
+                        <button class="preset-button" onclick="blobMaker.applyPreset('cloud')">
+                            <i class="fas fa-cloud-sun"></i> Cloud
+                        </button>
+                        <button class="preset-button" onclick="blobMaker.applyPreset('organic')">
+                            <i class="fas fa-leaf"></i> Organic
+                        </button>
+                        <button class="preset-button" onclick="blobMaker.applyPreset('minimal')">
+                            <i class="fas fa-circle"></i> Minimal
+                        </button>
+                        <button class="preset-button" onclick="blobMaker.applyPreset('complex')">
+                            <i class="fas fa-puzzle-piece"></i> Complex
+                        </button>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <h3><i class="fas fa-bolt"></i> Actions</h3>
+                    <button class="button button-primary" onclick="blobMaker.generateBlob()">
+                        <i class="fas fa-plus"></i> Generate New
+                    </button>
+                    <button class="button button-secondary" onclick="blobMaker.saveToHistory()">
+                        <i class="fas fa-history"></i> Save to History
+                    </button>
+                    <div class="advanced-toggle" onclick="blobMaker.toggleAdvanced()">
+                        <i class="fas fa-cogs"></i> Advanced Options
+                    </div>
+                    <div class="advanced-settings" id="advancedSettings">
+                        <div class="control-group">
+                            <label for="exportWidth">Export Width</label>
+                            <input type="number" id="exportWidth" class="form-input" value="500" min="50" max="4000">
+                        </div>
+                        <div class="control-group">
+                            <label for="exportHeight">Export Height</label>
+                            <input type="number" id="exportHeight" class="form-input" value="500" min="50" max="4000">
+                        </div>
+                        <div class="control-group">
+                            <label for="blobSeed">Blob Seed</label>
+                            <input type="text" id="blobSeed" class="form-input" placeholder="Enter seed for reproducible blobs">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3><i class="fas fa-download"></i> Export Options</h3>
+            <div class="export-buttons">
+                <button class="button button-primary" onclick="blobMaker.exportSVG()">
+                    <i class="fas fa-file-code"></i> Download SVG
+                </button>
+                <button class="button button-secondary" onclick="blobMaker.exportPNG()">
+                    <i class="fas fa-file-image"></i> Download PNG
+                </button>
+                <button class="button button-secondary" onclick="blobMaker.copyToClipboard()">
+                    <i class="fas fa-copy"></i> Copy SVG Code
+                </button>
+                <button class="button button-secondary" onclick="blobMaker.toggleCodeView()">
+                    <i class="fas fa-code"></i> Show/Hide Code
+                </button>
+                <button class="button button-secondary" onclick="blobMaker.shareBlob()">
+                    <i class="fas fa-share-alt"></i> Share Blob
+                </button>
+                <button class="button button-secondary" onclick="blobMaker.exportConfig()">
+                    <i class="fas fa-cog"></i> Export Config
+                </button>
+            </div>
+            <div id="codeOutput" class="code-output" style="display: none;"></div>
+        </div>
+
+        <div class="history-section">
+            <h3><i class="fas fa-history"></i> Blob History</h3>
+            <p>Click on any blob to restore its settings. Drag to reorder.</p>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Share Blob</h3>
+                <button class="modal-close" onclick="blobMaker.closeModal('shareModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Shareable Link</label>
+                    <input type="text" id="shareLink" class="form-input" readonly>
+                    <p class="help-text">Copy this link to share your blob with others</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Embed Code</label>
+                    <textarea id="embedCode" class="form-input form-textarea" readonly></textarea>
+                    <p class="help-text">Use this code to embed the blob on your website</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button button-secondary" onclick="blobMaker.closeModal('shareModal')">Close</button>
+                <button class="button button-primary" onclick="blobMaker.copyShareLink()">Copy Link</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="favoritesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Favorite Blobs</h3>
+                <button class="modal-close" onclick="blobMaker.closeModal('favoritesModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="history-grid" id="favoritesGrid"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="button button-secondary" onclick="blobMaker.closeModal('favoritesModal')">Close</button>
+                <button class="button button-primary" onclick="blobMaker.exportFavorites()">Export All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BlobMakerPro {
+            constructor() {
+                this.history = [];
+                this.favorites = [];
+                this.currentBlob = null;
+                this.isAnimated = false;
+                this.startTime = Date.now();
+                this.exportCount = 0;
+                this.blobCount = 0;
+                this.favoriteCount = 0;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadFromLocalStorage();
+                this.generateBlob();
+                this.updateStats();
+                setInterval(() => this.updateStats(), 1000);
+                
+                // Show welcome message
+                setTimeout(() => {
+                    this.showToast('Welcome to BlobCraft Pro!', 'Use the controls to create beautiful SVG blobs.', 'info');
+                }, 1000);
+            }
+
+            setupEventListeners() {
+                const controls = ['complexity', 'irregularity', 'size', 'roundness', 'strokeWidth', 
+                                 'smoothness', 'rotation', 'animationSpeed'];
+                controls.forEach(control => {
+                    const element = document.getElementById(control);
+                    if (element) {
+                        element.addEventListener('input', () => {
+                            this.updateSliderValue(control);
+                            this.generateBlob();
+                        });
+                    }
+                });
+
+                document.getElementById('fillColor').addEventListener('change', () => this.updateGradient());
+                document.getElementById('fillColor2').addEventListener('change', () => this.updateGradient());
+                document.getElementById('gradientType').addEventListener('change', () => this.updateGradient());
+                document.getElementById('strokeColor').addEventListener('change', () => this.generateBlob());
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' && !e.target.matches('input, textarea')) {
+                        e.preventDefault();
+                        this.randomizeBlob();
+                    } else if (e.key === 's' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.saveToHistory();
+                    } else if (e.key === 'e' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.exportSVG();
+                    } else if (e.key === 'f' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.saveToFavorites();
+                    } else if (e.key === 'h' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.toggleHistory();
+                    }
+                });
+
+                // Initialize Sortable for history grid
+                this.initSortable();
+            }
+
+            initSortable() {
+                // This would be implemented with a library like Sortable.js in a real application
+                // For now, we'll just add a placeholder for this functionality
+                console.log('Sortable initialization would happen here');
+            }
+
+            updateSliderValue(controlId) {
+                const slider = document.getElementById(controlId);
+                const valueDisplay = document.getElementById(controlId + 'Value');
+                if (!slider || !valueDisplay) return;
+                
+                let value = slider.value;
+                
+                if (controlId === 'irregularity' || controlId === 'roundness' || controlId === 'smoothness') {
+                    value += '%';
+                } else if (controlId === 'rotation') {
+                    value += '°';
+                } else if (controlId === 'animationSpeed') {
+                    value = Math.round((value / 100) * 100) + '%';
+                }
+                
+                valueDisplay.textContent = value;
+            }
+
+            generateBlob() {
+                const complexity = parseInt(document.getElementById('complexity').value);
+                const irregularity = parseInt(document.getElementById('irregularity').value) / 100;
+                const size = parseInt(document.getElementById('size').value);
+                const roundness = parseInt(document.getElementById('roundness').value) / 100;
+                const smoothness = parseInt(document.getElementById('smoothness').value) / 100;
+                const rotation = parseInt(document.getElementById('rotation').value);
+                const fillColor = document.getElementById('fillColor').value;
+                const fillColor2 = document.getElementById('fillColor2').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+                const gradientType = document.getElementById('gradientType').value;
+
+                const path = this.createBlobPath(complexity, irregularity, size, roundness, smoothness);
+                const blobPath = document.getElementById('blobPath');
+                
+                blobPath.setAttribute('d', path);
+                blobPath.setAttribute('transform', `translate(250,250) rotate(${rotation})`);
+                blobPath.setAttribute('stroke', strokeColor);
+                blobPath.setAttribute('stroke-width', strokeWidth);
+
+                this.updateGradient();
+
+                this.currentBlob = {
+                    path,
+                    complexity,
+                    irregularity: irregularity * 100,
+                    size,
+                    roundness: roundness * 100,
+                    smoothness: smoothness * 100,
+                    rotation,
+                    fillColor,
+                    fillColor2,
+                    strokeColor,
+                    strokeWidth,
+                    gradientType,
+                    timestamp: new Date()
+                };
+
+                this.updateCodeOutput();
+                this.blobCount++;
+                document.getElementById('blobCount').textContent = this.blobCount;
+            }
+
+            updateGradient() {
+                const fillColor = document.getElementById('fillColor').value;
+                const fillColor2 = document.getElementById('fillColor2').value;
+                const gradientType = document.getElementById('gradientType').value;
+                
+                const defs = document.querySelector('defs');
+                let gradient = document.getElementById('blobGradient');
+                
+                if (!gradient) {
+                    gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                    gradient.setAttribute('id', 'blobGradient');
+                    defs.appendChild(gradient);
+                }
+                
+                if (gradientType === 'linear') {
+                    gradient.setAttribute('x1', '0%');
+                    gradient.setAttribute('y1', '0%');
+                    gradient.setAttribute('x2', '100%');
+                    gradient.setAttribute('y2', '100%');
+                } else {
+                    gradient.setAttribute('cx', '50%');
+                    gradient.setAttribute('cy', '50%');
+                    gradient.setAttribute('r', '50%');
+                    gradient.setAttribute('fx', '25%');
+                    gradient.setAttribute('fy', '25%');
+                }
+                
+                gradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:${fillColor}" />
+                    <stop offset="100%" style="stop-color:${fillColor2}" />
+                `;
+            }
+
+            createBlobPath(points, irregularity, size, roundness, smoothness) {
+                const angleStep = (Math.PI * 2) / points;
+                const pathPoints = [];
+
+                for (let i = 0; i < points; i++) {
+                    const angle = i * angleStep;
+                    const randomRadius = size * (1 + (Math.random() - 0.5) * irregularity);
+                    
+                    const x = Math.cos(angle) * randomRadius;
+                    const y = Math.sin(angle) * randomRadius;
+                    
+                    pathPoints.push({ x, y });
+                }
+
+                // Apply smoothing
+                if (smoothness > 0) {
+                    for (let s = 0; s < smoothness * 3; s++) {
+                        const newPathPoints = [];
+                        for (let i = 0; i < pathPoints.length; i++) {
+                            const prev = pathPoints[(i - 1 + pathPoints.length) % pathPoints.length];
+                            const current = pathPoints[i];
+                            const next = pathPoints[(i + 1) % pathPoints.length];
+                            
+                            newPathPoints.push({
+                                x: (prev.x + current.x + next.x) / 3,
+                                y: (prev.y + current.y + next.y) / 3
+                            });
+                        }
+                        pathPoints.splice(0, pathPoints.length, ...newPathPoints);
+                    }
+                }
+
+                let path = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+                
+                for (let i = 0; i < points; i++) {
+                    const current = pathPoints[i];
+                    const next = pathPoints[(i + 1) % points];
+                    
+                    const cp1x = current.x + (next.x - current.x) * roundness * 0.5;
+                    const cp1y = current.y + (next.y - current.y) * roundness * 0.5;
+                    const cp2x = next.x - (next.x - current.x) * roundness * 0.5;
+                    const cp2y = next.y - (next.y - current.y) * roundness * 0.5;
+                    
+                    if (roundness > 0.1) {
+                        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                    } else {
+                        path += ` L ${next.x} ${next.y}`;
+                    }
+                }
+                
+                path += ' Z';
+                return path;
+            }
+
+            randomizeBlob() {
+                document.getElementById('complexity').value = Math.floor(Math.random() * 15) + 3;
+                document.getElementById('irregularity').value = Math.floor(Math.random() * 101);
+                document.getElementById('size').value = Math.floor(Math.random() * 131) + 50;
+                document.getElementById('roundness').value = Math.floor(Math.random() * 101);
+                document.getElementById('smoothness').value = Math.floor(Math.random() * 101);
+                document.getElementById('rotation').value = Math.floor(Math.random() * 361);
+                document.getElementById('fillColor').value = this.getRandomColor();
+                document.getElementById('fillColor2').value = this.getRandomColor();
+                document.getElementById('strokeColor').value = this.getRandomColor();
+                document.getElementById('strokeWidth').value = Math.floor(Math.random() * 6);
+                document.getElementById('gradientType').value = Math.random() > 0.5 ? 'linear' : 'radial';
+                document.getElementById('animationSpeed').value = Math.floor(Math.random() * 191) + 10;
+                
+                ['complexity', 'irregularity', 'size', 'roundness', 'smoothness', 'rotation', 'strokeWidth', 'animationSpeed'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+                
+                this.generateBlob();
+                this.showToast('Random blob generated!', 'You can further customize it using the controls.', 'success');
+            }
+
+            getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            applyPreset(preset) {
+                const presets = {
+                    smooth: { complexity: 6, irregularity: 20, size: 120, roundness: 80, smoothness: 70 },
+                    spiky: { complexity: 10, irregularity: 80, size: 100, roundness: 10, smoothness: 20 },
+                    cloud: { complexity: 8, irregularity: 40, size: 140, roundness: 70, smoothness: 60 },
+                    organic: { complexity: 7, irregularity: 60, size: 110, roundness: 50, smoothness: 50 },
+                    minimal: { complexity: 4, irregularity: 30, size: 90, roundness: 60, smoothness: 40 },
+                    complex: { complexity: 12, irregularity: 70, size: 130, roundness: 30, smoothness: 80 }
+                };
+
+                const config = presets[preset];
+                Object.keys(config).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.value = config[key];
+                        this.updateSliderValue(key);
+                    }
+                });
+
+                this.generateBlob();
+                this.showToast(`"${preset}" preset applied`, 'You can further customize the blob.', 'success');
+            }
+
+            toggleAnimation() {
+                const blobPath = document.getElementById('blobPath');
+                this.isAnimated = !this.isAnimated;
+                
+                if (this.isAnimated) {
+                    blobPath.classList.add('animated');
+                    this.showToast('Animation started', 'The blob is now animated.', 'success');
+                } else {
+                    blobPath.classList.remove('animated');
+                    this.showToast('Animation stopped', 'The blob animation is paused.', 'info');
+                }
+            }
+
+            resetBlob() {
+                document.getElementById('complexity').value = 6;
+                document.getElementById('irregularity').value = 50;
+                document.getElementById('size').value = 100;
+                document.getElementById('roundness').value = 50;
+                document.getElementById('smoothness').value = 50;
+                document.getElementById('rotation').value = 0;
+                document.getElementById('fillColor').value = '#667eea';
+                document.getElementById('fillColor2').value = '#764ba2';
+                document.getElementById('strokeColor').value = '#764ba2';
+                document.getElementById('strokeWidth').value = 0;
+                document.getElementById('gradientType').value = 'linear';
+                document.getElementById('animationSpeed').value = 100;
+                
+                ['complexity', 'irregularity', 'size', 'roundness', 'smoothness', 'rotation', 'strokeWidth', 'animationSpeed'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+                
+                this.generateBlob();
+                this.showToast('Blob reset to default', 'All settings have been reset.', 'info');
+            }
+
+            saveToHistory() {
+                if (this.currentBlob) {
+                    this.history.unshift({ ...this.currentBlob });
+                    if (this.history.length > 20) {
+                        this.history = this.history.slice(0, 20);
+                    }
+                    this.updateHistoryDisplay();
+                    this.saveToLocalStorage();
+                    this.showToast('Blob saved to history', 'You can restore it anytime from the history section.', 'success');
+                }
+            }
+
+            saveToFavorites() {
+                if (this.currentBlob) {
+                    this.favorites.unshift({ ...this.currentBlob });
+                    this.favoriteCount++;
+                    document.getElementById('favoriteCount').textContent = this.favoriteCount;
+                    this.saveToLocalStorage();
+                    this.showToast('Blob added to favorites', 'You can access it from the favorites menu.', 'success');
+                }
+            }
+
+            updateHistoryDisplay() {
+                const grid = document.getElementById('historyGrid');
+                grid.innerHTML = '';
+
+                this.history.forEach((blob, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item fade-in-scale micro-interaction';
+                    item.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const svg = `
+                        <svg viewBox="0 0 400 400">
+                            <defs>
+                                <linearGradient id="history-gradient-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:${blob.fillColor}" />
+                                    <stop offset="100%" style="stop-color:${blob.fillColor2}" />
+                                </linearGradient>
+                            </defs>
+                            <path d="${blob.path}" 
+                                  fill="url(#history-gradient-${index})" 
+                                  stroke="${blob.strokeColor}"
+                                  stroke-width="${blob.strokeWidth}"
+                                  transform="translate(200,200) rotate(${blob.rotation})"/>
+                        </svg>
+                        <div class="history-item-info">
+                            <strong>${blob.timestamp.toLocaleTimeString()}</strong>
+                            <br>
+                            <small>Points: ${blob.complexity}</small>
+                        </div>
+                        <div class="history-item-actions">
+                            <div class="history-item-action" onclick="event.stopPropagation(); blobMaker.deleteHistoryItem(${index})">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                    `;
+                    
+                    item.innerHTML = svg;
+                    item.onclick = () => {
+                        this.restoreFromHistory(index);
+                        this.showToast('Blob restored from history', 'The blob settings have been applied.', 'success');
+                    };
+                    grid.appendChild(item);
+                });
+            }
+
+            restoreFromHistory(index) {
+                const blob = this.history[index];
+                
+                document.getElementById('complexity').value = blob.complexity;
+                document.getElementById('irregularity').value = blob.irregularity;
+                document.getElementById('size').value = blob.size;
+                document.getElementById('roundness').value = blob.roundness;
+                document.getElementById('smoothness').value = blob.smoothness;
+                document.getElementById('rotation').value = blob.rotation;
+                document.getElementById('fillColor').value = blob.fillColor;
+                document.getElementById('fillColor2').value = blob.fillColor2;
+                document.getElementById('strokeColor').value = blob.strokeColor;
+                document.getElementById('strokeWidth').value = blob.strokeWidth;
+                document.getElementById('gradientType').value = blob.gradientType || 'linear';
+
+                ['complexity', 'irregularity', 'size', 'roundness', 'smoothness', 'rotation', 'strokeWidth'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+
+                this.generateBlob();
+            }
+
+            deleteHistoryItem(index) {
+                this.history.splice(index, 1);
+                this.updateHistoryDisplay();
+                this.saveToLocalStorage();
+                this.showToast('Item removed from history', 'The blob has been deleted from your history.', 'info');
+            }
+
+            exportSVG() {
+                if (!this.currentBlob) return;
+
+                const width = document.getElementById('exportWidth').value || 500;
+                const height = document.getElementById('exportHeight').value || 500;
+
+                const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${width}" height="${height}" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="exportGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:${this.currentBlob.fillColor}"/>
+            <stop offset="100%" style="stop-color:${this.currentBlob.fillColor2}"/>
+        </linearGradient>
+    </defs>
+    <path d="${this.currentBlob.path}" 
+          fill="url(#exportGradient)" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(250,250) rotate(${this.currentBlob.rotation})"/>
+</svg>`;
+
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `blobcraft-${Date.now()}.svg`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.exportCount++;
+                document.getElementById('exportCount').textContent = this.exportCount;
+                this.showToast('SVG exported successfully', 'The SVG file has been downloaded.', 'success');
+            }
+
+            exportPNG() {
+                const canvas = document.createElement('canvas');
+                const width = document.getElementById('exportWidth').value || 500;
+                const height = document.getElementById('exportHeight').value || 500;
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+
+                // Create a temporary SVG with the specified dimensions
+                const tempSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 500 500">
+    <defs>
+        <linearGradient id="tempGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:${this.currentBlob.fillColor}"/>
+            <stop offset="100%" style="stop-color:${this.currentBlob.fillColor2}"/>
+        </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="white"/>
+    <path d="${this.currentBlob.path}" 
+          fill="url(#tempGradient)" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(250,250) rotate(${this.currentBlob.rotation})"/>
+</svg>`;
+
+                const img = new Image();
+                const svgBlob = new Blob([tempSvg], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(blob => {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `blobcraft-${Date.now()}.png`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                    
+                    this.exportCount++;
+                    document.getElementById('exportCount').textContent = this.exportCount;
+                    this.showToast('PNG exported successfully', 'The PNG file has been downloaded.', 'success');
+                };
+
+                img.src = url;
+            }
+
+            copyToClipboard() {
+                if (!this.currentBlob) return;
+
+                const svg = `<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="copyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:${this.currentBlob.fillColor}"/>
+            <stop offset="100%" style="stop-color:${this.currentBlob.fillColor2}"/>
+        </linearGradient>
+    </defs>
+    <path d="${this.currentBlob.path}" 
+          fill="url(#copyGradient)" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(250,250) rotate(${this.currentBlob.rotation})"/>
+</svg>`;
+
+                navigator.clipboard.writeText(svg).then(() => {
+                    this.showToast('SVG code copied to clipboard', 'You can now paste it into your code editor.', 'success');
+                }).catch(err => {
+                    this.showToast('Failed to copy to clipboard', 'Please try again or use the export options.', 'error');
+                });
+            }
+
+            toggleCodeView() {
+                const codeOutput = document.getElementById('codeOutput');
+                if (codeOutput.style.display === 'none') {
+                    this.updateCodeOutput();
+                    codeOutput.style.display = 'block';
+                } else {
+                    codeOutput.style.display = 'none';
+                }
+            }
+
+            updateCodeOutput() {
+                if (!this.currentBlob) return;
+
+                const svg = `<!-- SVG Blob Generated with BlobCraft Pro -->
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${this.currentBlob.fillColor}"/>
+            <stop offset="100%" stop-color="${this.currentBlob.fillColor2}"/>
+        </linearGradient>
+    </defs>
+    <path d="${this.currentBlob.path}" 
+          fill="url(#blobGradient)" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(250,250) rotate(${this.currentBlob.rotation})"/>
+</svg>`;
+
+                document.getElementById('codeOutput').textContent = svg;
+            }
+
+            shareBlob() {
+                if (!this.currentBlob) return;
+                
+                // In a real application, we would generate a shareable link
+                // For this demo, we'll just show a modal with placeholder text
+                const modal = document.getElementById('shareModal');
+                modal.classList.add('active');
+                
+                document.getElementById('shareLink').value = 'https://blobcraft.pro/share/' + Math.random().toString(36).substring(2, 10);
+                document.getElementById('embedCode').value = `<iframe src="${document.getElementById('shareLink').value}" width="500" height="500" frameborder="0"></iframe>`;
+            }
+
+            exportConfig() {
+                if (!this.currentBlob) return;
+                
+                const config = JSON.stringify(this.currentBlob, null, 2);
+                const blob = new Blob([config], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `blobcraft-config-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.showToast('Configuration exported', 'You can import this config later to restore the blob.', 'success');
+            }
+
+            toggleAdvanced() {
+                const advancedSettings = document.getElementById('advancedSettings');
+                advancedSettings.classList.toggle('active');
+            }
+
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+
+            copyShareLink() {
+                const shareLink = document.getElementById('shareLink');
+                shareLink.select();
+                document.execCommand('copy');
+                this.showToast('Link copied to clipboard', 'You can now share this link with others.', 'success');
+            }
+
+            showToast(title, message, type) {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas fa-${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Remove toast after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 5000);
+            }
+
+            updateStats() {
+                const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+                const minutes = Math.floor(elapsedSeconds / 60);
+                const seconds = elapsedSeconds % 60;
+                document.getElementById('totalTime').textContent = `${minutes}m ${seconds}s`;
+            }
+
+            loadFromLocalStorage() {
+                try {
+                    const savedHistory = localStorage.getItem('blobcraft-history');
+                    const savedFavorites = localStorage.getItem('blobcraft-favorites');
+                    const savedStats = localStorage.getItem('blobcraft-stats');
+                    
+                    if (savedHistory) {
+                        this.history = JSON.parse(savedHistory);
+                        this.updateHistoryDisplay();
+                    }
+                    
+                    if (savedFavorites) {
+                        this.favorites = JSON.parse(savedFavorites);
+                        this.favoriteCount = this.favorites.length;
+                        document.getElementById('favoriteCount').textContent = this.favoriteCount;
+                    }
+                    
+                    if (savedStats) {
+                        const stats = JSON.parse(savedStats);
+                        this.exportCount = stats.exportCount || 0;
+                        this.blobCount = stats.blobCount || 0;
+                        document.getElementById('exportCount').textContent = this.exportCount;
+                        document.getElementById('blobCount').textContent = this.blobCount;
+                    }
+                } catch (e) {
+                    console.error('Error loading from localStorage', e);
+                }
+            }
+
+            saveToLocalStorage() {
+                try {
+                    localStorage.setItem('blobcraft-history', JSON.stringify(this.history));
+                    localStorage.setItem('blobcraft-favorites', JSON.stringify(this.favorites));
+                    localStorage.setItem('blobcraft-stats', JSON.stringify({
+                        exportCount: this.exportCount,
+                        blobCount: this.blobCount
+                    }));
+                } catch (e) {
+                    console.error('Error saving to localStorage', e);
+                }
+            }
+        }
+
+        // Initialize the application
+        const blobMaker = new BlobMakerPro();
+
+        // Helper functions for global access
+        function toggleAnimation() {
+            blobMaker.toggleAnimation();
+        }
+
+        function randomizeBlob() {
+            blobMaker.randomizeBlob();
+        }
+
+        function resetBlob() {
+            blobMaker.resetBlob();
+        }
+
+        function applyPreset(preset) {
+            blobMaker.applyPreset(preset);
+        }
+
+        function generateBlob() {
+            blobMaker.generateBlob();
+        }
+
+        function saveToHistory() {
+            blobMaker.saveToHistory();
+        }
+
+        function exportSVG() {
+            blobMaker.exportSVG();
+        }
+
+        function exportPNG() {
+            blobMaker.exportPNG();
+        }
+
+        function copyToClipboard() {
+            blobMaker.copyToClipboard();
+        }
+
+        function toggleCodeView() {
+            blobMaker.toggleCodeView();
+        }
+
+        function shareBlob() {
+            blobMaker.shareBlob();
+        }
+
+        function exportConfig() {
+            blobMaker.exportConfig();
+        }
+    </script>
+</body>
+</html>
