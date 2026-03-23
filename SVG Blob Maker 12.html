@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlobCraft Pro - Advanced SVG Blob Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f3f4f6;
+            --lighter: #f9fafb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --secondary: #f472b6;
+            --dark: #f3f4f6;
+            --darker: #e5e7eb;
+            --light: #1f2937;
+            --lighter: #111827;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(15deg);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .workspace {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .controls-panel {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            transition: var(--transition);
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .controls-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .controls-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--light);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -25px;
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 45px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .button-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .button-secondary {
+            background: var(--lighter);
+            color: var(--dark);
+            border: 2px solid var(--light);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .button-secondary:hover {
+            background: var(--light);
+            border-color: var(--primary);
+        }
+
+        .canvas-area {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            min-height: 500px;
+            position: relative;
+            border: 2px dashed var(--light);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .canvas-area:hover {
+            border-color: var(--primary);
+            background: var(--lighter);
+        }
+
+        .blob-svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
+            transition: var(--transition);
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .preset-button {
+            padding: 8px;
+            background: var(--lighter);
+            border: 1px solid var(--light);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .preset-button:hover {
+            background: var(--light);
+            border-color: var(--primary);
+        }
+
+        .history-section {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: var(--lighter);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .history-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--primary);
+        }
+
+        .history-item svg {
+            width: 100%;
+            height: 80px;
+        }
+
+        .history-item-info {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: var(--dark);
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .history-item-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .history-item:hover .history-item-delete {
+            opacity: 1;
+        }
+
+        .export-section {
+            background: var(--lighter);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .export-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .randomize-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .code-output {
+            background: var(--darker);
+            color: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+            font-size: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid var(--dark);
+            transition: var(--transition);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--light);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 8px 15px;
+            background: var(--lighter);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .advanced-controls {
+            background: var(--light);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-top: 15px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background: var(--darker);
+            color: var(--lighter);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes morph {
+            0%, 100% { d: path("M60,-60C80,-40,100,-20,100,0C100,20,80,40,60,60C40,80,20,100,0,100C-20,100,-40,80,-60,60C-80,40,-100,20,-100,0C-100,-20,-80,-40,-60,-60C-40,-80,-20,-100,0,-100C20,-100,40,-80,60,-60Z"); }
+            50% { d: path("M50,-70C70,-50,90,-25,95,0C100,25,80,50,50,70C20,90,-10,95,-35,70C-60,45,-80,20,-85,0C-90,-20,-70,-45,-50,-70C-30,-95,0,-95,25,-70C50,-45,50,-70,50,-70Z"); }
+        }
+
+        .animated {
+            animation: morph 4s ease-in-out infinite;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: var(--lighter);
+            color: var(--dark);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                align-self: center;
+            }
+            
+            .export-buttons, .preset-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .animation-controls {
+                flex-direction: column;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Dark mode specific styles */
+        body.dark-mode {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary) 100%);
+        }
+
+        body.dark-mode .workspace,
+        body.dark-mode .controls-panel,
+        body.dark-mode .history-section,
+        body.dark-mode .export-section {
+            background: rgba(30, 30, 40, 0.9);
+            color: var(--darker);
+        }
+
+        body.dark-mode .control-group label,
+        body.dark-mode .history-item-info {
+            color: var(--darker);
+        }
+
+        body.dark-mode .canvas-area {
+            background: rgba(40, 40, 50, 0.9);
+        }
+
+        body.dark-mode .button-secondary {
+            background: rgba(30, 30, 40, 0.9);
+            color: var(--darker);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .preset-button {
+            background: rgba(30, 30, 40, 0.9);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--darker);
+        }
+
+        body.dark-mode .controls-section {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-blob logo-icon"></i>
+                <h1>BlobCraft Pro</h1>
+            </div>
+            <p>Professional SVG Blob Generator with Advanced Features</p>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <i class="fas fa-blob stat-icon"></i>
+                <span class="stat-value" id="blobCount">0</span>
+                <span class="stat-label">Blobs Created</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-clock stat-icon"></i>
+                <span class="stat-value" id="totalTime">0s</span>
+                <span class="stat-label">Session Time</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-download stat-icon"></i>
+                <span class="stat-value" id="exportCount">0</span>
+                <span class="stat-label">Exports</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-history stat-icon"></i>
+                <span class="stat-value" id="historyCount">0</span>
+                <span class="stat-label">In History</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="workspace">
+                <div class="canvas-area">
+                    <svg id="blobCanvas" width="400" height="400" viewBox="0 0 400 400">
+                        <defs>
+                            <linearGradient id="blobGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea"/>
+                                <stop offset="100%" style="stop-color:#764ba2"/>
+                            </linearGradient>
+                            <filter id="blobShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
+                                <feOffset dx="5" dy="5" result="offsetblur"/>
+                                <feFlood flood-color="rgba(0,0,0,0.2)"/>
+                                <feComposite in2="offsetblur" operator="in"/>
+                                <feMerge>
+                                    <feMergeNode/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <path id="blobPath" fill="url(#blobGradient)" transform="translate(200,200)" filter="url(#blobShadow)"/>
+                    </svg>
+                </div>
+                
+                <div class="animation-controls">
+                    <button class="button button-secondary" onclick="blobMaker.toggleAnimation()">
+                        <i class="fas fa-play"></i> Toggle Animation
+                    </button>
+                    <button class="button button-secondary" onclick="blobMaker.randomizeBlob()">
+                        <i class="fas fa-random"></i> Random Blob
+                    </button>
+                    <button class="button button-secondary" onclick="blobMaker.resetBlob()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="tabs">
+                    <div class="tab active" data-tab="basic">Basic</div>
+                    <div class="tab" data-tab="advanced">Advanced</div>
+                    <div class="tab" data-tab="export">Export</div>
+                </div>
+
+                <div class="tab-content active" id="basic-tab">
+                    <div class="controls-section">
+                        <h3>Shape Controls</h3>
+                        
+                        <div class="control-group">
+                            <label for="complexity">Complexity <span class="tooltip">ⓘ<span class="tooltip-text">Number of points around the blob</span></span></label>
+                            <div class="slider-container">
+                                <input type="range" id="complexity" class="slider" min="3" max="20" value="8">
+                                <span class="slider-value" id="complexityValue">8</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="irregularity">Irregularity <span class="tooltip">ⓘ<span class="tooltip-text">How much the points vary from the base shape</span></span></label>
+                            <div class="slider-container">
+                                <input type="range" id="irregularity" class="slider" min="0" max="100" value="50">
+                                <span class="slider-value" id="irregularityValue">50%</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="size">Size <span class="tooltip">ⓘ<span class="tooltip-text">Overall size of the blob</span></span></label>
+                            <div class="slider-container">
+                                <input type="range" id="size" class="slider" min="50" max="180" value="100">
+                                <span class="slider-value" id="sizeValue">100</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="roundness">Roundness <span class="tooltip">ⓘ<span class="tooltip-text">How smooth or sharp the edges are</span></span></label>
+                            <div class="slider-container">
+                                <input type="range" id="roundness" class="slider" min="0" max="100" value="50">
+                                <span class="slider-value" id="roundnessValue">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Style Controls</h3>
+                        
+                        <div class="control-group">
+                            <label for="fillColor">Fill Color</label>
+                            <input type="color" id="fillColor" class="color-input" value="#667eea">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="strokeColor">Stroke Color</label>
+                            <input type="color" id="strokeColor" class="color-input" value="#764ba2">
+                        </div>
+
+                        <div class="control-group">
+                            <label for="strokeWidth">Stroke Width</label>
+                            <div class="slider-container">
+                                <input type="range" id="strokeWidth" class="slider" min="0" max="10" value="0">
+                                <span class="slider-value" id="strokeWidthValue">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Quick Presets</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-button" onclick="blobMaker.applyPreset('smooth')">
+                                <i class="fas fa-circle"></i> Smooth
+                            </button>
+                            <button class="preset-button" onclick="blobMaker.applyPreset('spiky')">
+                                <i class="fas fa-asterisk"></i> Spiky
+                            </button>
+                            <button class="preset-button" onclick="blobMaker.applyPreset('cloud')">
+                                <i class="fas fa-cloud"></i> Cloud
+                            </button>
+                            <button class="preset-button" onclick="blobMaker.applyPreset('organic')">
+                                <i class="fas fa-leaf"></i> Organic
+                            </button>
+                            <button class="preset-button" onclick="blobMaker.applyPreset('minimal')">
+                                <i class="fas fa-minimize"></i> Minimal
+                            </button>
+                            <button class="preset-button" onclick="blobMaker.applyPreset('complex')">
+                                <i class="fas fa-star-of-life"></i> Complex
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Actions</h3>
+                        <div class="randomize-controls">
+                            <button class="button button-primary" onclick="blobMaker.generateBlob()">
+                                <i class="fas fa-plus"></i> Generate New
+                            </button>
+                        </div>
+                        <button class="button button-secondary" onclick="blobMaker.saveToHistory()">
+                            <i class="fas fa-save"></i> Save to History
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="advanced-tab">
+                    <div class="controls-section">
+                        <h3>Animation Settings</h3>
+                        
+                        <div class="control-group">
+                            <label for="animationSpeed">Animation Speed</label>
+                            <div class="slider-container">
+                                <input type="range" id="animationSpeed" class="slider" min="1" max="10" value="5">
+                                <span class="slider-value" id="animationSpeedValue">5</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="animationType">Animation Type</label>
+                            <select id="animationType" class="slider">
+                                <option value="morph">Morph</option>
+                                <option value="pulse">Pulse</option>
+                                <option value="rotate">Rotate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Advanced Parameters</h3>
+                        
+                        <div class="control-group">
+                            <label for="seed">Random Seed</label>
+                            <div class="slider-container">
+                                <input type="range" id="seed" class="slider" min="1" max="1000" value="500">
+                                <span class="slider-value" id="seedValue">500</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="contrast">Contrast</label>
+                            <div class="slider-container">
+                                <input type="range" id="contrast" class="slider" min="0" max="100" value="50">
+                                <span class="slider-value" id="contrastValue">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Effects</h3>
+                        
+                        <div class="control-group">
+                            <label for="shadow">Shadow Intensity</label>
+                            <div class="slider-container">
+                                <input type="range" id="shadow" class="slider" min="0" max="20" value="10">
+                                <span class="slider-value" id="shadowValue">10</span>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="blur">Edge Blur</label>
+                            <div class="slider-container">
+                                <input type="range" id="blur" class="slider" min="0" max="20" value="0">
+                                <span class="slider-value" id="blurValue">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="export-tab">
+                    <div class="controls-section">
+                        <h3>Export Options</h3>
+                        <div class="export-buttons">
+                            <button class="button button-primary" onclick="blobMaker.exportSVG()">
+                                <i class="fas fa-download"></i> Download SVG
+                            </button>
+                            <button class="button button-secondary" onclick="blobMaker.exportPNG()">
+                                <i class="fas fa-download"></i> Download PNG
+                            </button>
+                            <button class="button button-secondary" onclick="blobMaker.copyToClipboard()">
+                                <i class="fas fa-copy"></i> Copy SVG Code
+                            </button>
+                            <button class="button button-secondary" onclick="blobMaker.toggleCodeView()">
+                                <i class="fas fa-code"></i> Show/Hide Code
+                            </button>
+                        </div>
+                        <div id="codeOutput" class="code-output" style="display: none;"></div>
+                    </div>
+
+                    <div class="controls-section">
+                        <h3>Share</h3>
+                        <div class="control-group">
+                            <label for="shareUrl">Shareable URL</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="text" id="shareUrl" readonly style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--light);">
+                                <button class="button button-secondary" onclick="blobMaker.copyUrl()" style="width: auto;">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="button button-primary" onclick="blobMaker.generateShareUrl()">
+                            <i class="fas fa-link"></i> Generate Share Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">
+                <h3>Blob History</h3>
+                <button class="button button-secondary" onclick="blobMaker.clearHistory()" style="width: auto;">
+                    <i class="fas fa-trash"></i> Clear History
+                </button>
+            </div>
+            <p>Click on any blob to restore its settings</p>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        class BlobMakerPro {
+            constructor() {
+                this.history = [];
+                this.currentBlob = null;
+                this.isAnimated = false;
+                this.startTime = Date.now();
+                this.exportCount = 0;
+                this.blobCount = 0;
+                this.isDarkMode = false;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.loadFromLocalStorage();
+                this.generateBlob();
+                this.updateStats();
+                this.setupTabs();
+                setInterval(() => this.updateStats(), 1000);
+
+                // Check for URL parameters to load a shared blob
+                this.checkUrlParameters();
+            }
+
+            setupEventListeners() {
+                const controls = ['complexity', 'irregularity', 'size', 'roundness', 'strokeWidth', 
+                                 'animationSpeed', 'seed', 'contrast', 'shadow', 'blur'];
+                controls.forEach(control => {
+                    const element = document.getElementById(control);
+                    if (element) {
+                        element.addEventListener('input', () => {
+                            this.updateSliderValue(control);
+                            this.generateBlob();
+                        });
+                    }
+                });
+
+                document.getElementById('fillColor').addEventListener('change', () => this.generateBlob());
+                document.getElementById('strokeColor').addEventListener('change', () => this.generateBlob());
+                document.getElementById('animationType').addEventListener('change', () => this.updateAnimation());
+                
+                // Theme toggle
+                document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        this.randomizeBlob();
+                    } else if (e.key === 's' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.saveToHistory();
+                    } else if (e.key === 'e' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.exportSVG();
+                    } else if (e.key === 'd' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.toggleTheme();
+                    }
+                });
+
+                // Responsive adjustments
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            setupTabs() {
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Remove active class from all tabs and contents
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to clicked tab and corresponding content
+                        tab.classList.add('active');
+                        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                    });
+                });
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                document.body.classList.toggle('dark-mode', this.isDarkMode);
+                document.getElementById('themeToggle').innerHTML = this.isDarkMode ? 
+                    '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                
+                // Save theme preference to localStorage
+                localStorage.setItem('blobmaker-darkmode', this.isDarkMode);
+            }
+
+            updateSliderValue(controlId) {
+                const slider = document.getElementById(controlId);
+                const valueDisplay = document.getElementById(controlId + 'Value');
+                if (!slider || !valueDisplay) return;
+                
+                let value = slider.value;
+                
+                if (controlId === 'irregularity' || controlId === 'roundness' || controlId === 'contrast') {
+                    value += '%';
+                }
+                
+                valueDisplay.textContent = value;
+            }
+
+            generateBlob() {
+                const complexity = parseInt(document.getElementById('complexity').value);
+                const irregularity = parseInt(document.getElementById('irregularity').value) / 100;
+                const size = parseInt(document.getElementById('size').value);
+                const roundness = parseInt(document.getElementById('roundness').value) / 100;
+                const fillColor = document.getElementById('fillColor').value;
+                const strokeColor = document.getElementById('strokeColor').value;
+                const strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+                const seed = parseInt(document.getElementById('seed').value);
+
+                // Use seed for reproducible randomness
+                this.setSeed(seed);
+
+                const path = this.createBlobPath(complexity, irregularity, size, roundness);
+                const blobPath = document.getElementById('blobPath');
+                
+                blobPath.setAttribute('d', path);
+                blobPath.setAttribute('fill', fillColor);
+                blobPath.setAttribute('stroke', strokeColor);
+                blobPath.setAttribute('stroke-width', strokeWidth);
+
+                // Update shadow effect if needed
+                const shadowIntensity = parseInt(document.getElementById('shadow').value);
+                if (shadowIntensity > 0) {
+                    blobPath.setAttribute('filter', 'url(#blobShadow)');
+                    document.querySelector('feGaussianBlur').setAttribute('stdDeviation', shadowIntensity / 2);
+                } else {
+                    blobPath.removeAttribute('filter');
+                }
+
+                this.currentBlob = {
+                    path,
+                    complexity,
+                    irregularity: irregularity * 100,
+                    size,
+                    roundness: roundness * 100,
+                    fillColor,
+                    strokeColor,
+                    strokeWidth,
+                    seed,
+                    timestamp: new Date()
+                };
+
+                this.updateCodeOutput();
+                this.blobCount++;
+                this.updateShareUrl();
+            }
+
+            setSeed(seed) {
+                // Simple pseudo-random generator with seed
+                this.seed = seed;
+                this.random = () => {
+                    const x = Math.sin(this.seed++) * 10000;
+                    return x - Math.floor(x);
+                };
+            }
+
+            createBlobPath(points, irregularity, size, roundness) {
+                const angleStep = (Math.PI * 2) / points;
+                const pathPoints = [];
+
+                for (let i = 0; i < points; i++) {
+                    const angle = i * angleStep;
+                    // Use seeded random for reproducible shapes
+                    const randomRadius = size * (1 + (this.random() - 0.5) * irregularity);
+                    
+                    const x = Math.cos(angle) * randomRadius;
+                    const y = Math.sin(angle) * randomRadius;
+                    
+                    pathPoints.push({ x, y });
+                }
+
+                let path = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+                
+                for (let i = 0; i < points; i++) {
+                    const current = pathPoints[i];
+                    const next = pathPoints[(i + 1) % points];
+                    
+                    const cp1x = current.x + (next.x - current.x) * roundness * 0.3;
+                    const cp1y = current.y + (next.y - current.y) * roundness * 0.3;
+                    const cp2x = next.x - (next.x - current.x) * roundness * 0.3;
+                    const cp2y = next.y - (next.y - current.y) * roundness * 0.3;
+                    
+                    if (roundness > 0.1) {
+                        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                    } else {
+                        path += ` L ${next.x} ${next.y}`;
+                    }
+                }
+                
+                path += ' Z';
+                return path;
+            }
+
+            randomizeBlob() {
+                document.getElementById('complexity').value = Math.floor(this.random() * 10) + 3;
+                document.getElementById('irregularity').value = Math.floor(this.random() * 101);
+                document.getElementById('size').value = Math.floor(this.random() * 131) + 50;
+                document.getElementById('roundness').value = Math.floor(this.random() * 101);
+                document.getElementById('seed').value = Math.floor(this.random() * 1000) + 1;
+                
+                ['complexity', 'irregularity', 'size', 'roundness', 'seed'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+                
+                this.generateBlob();
+                this.showToast('Random blob generated!', 'success');
+            }
+
+            applyPreset(preset) {
+                const presets = {
+                    smooth: { complexity: 6, irregularity: 20, size: 120, roundness: 80 },
+                    spiky: { complexity: 10, irregularity: 80, size: 100, roundness: 10 },
+                    cloud: { complexity: 8, irregularity: 40, size: 140, roundness: 70 },
+                    organic: { complexity: 7, irregularity: 60, size: 110, roundness: 50 },
+                    minimal: { complexity: 4, irregularity: 30, size: 90, roundness: 60 },
+                    complex: { complexity: 12, irregularity: 70, size: 130, roundness: 30 }
+                };
+
+                const config = presets[preset];
+                Object.keys(config).forEach(key => {
+                    document.getElementById(key).value = config[key];
+                    this.updateSliderValue(key);
+                });
+
+                this.generateBlob();
+                this.showToast(`"${preset}" preset applied`, 'success');
+            }
+
+            toggleAnimation() {
+                const blobPath = document.getElementById('blobPath');
+                this.isAnimated = !this.isAnimated;
+                
+                if (this.isAnimated) {
+                    blobPath.classList.add('animated');
+                    // Update animation speed
+                    this.updateAnimation();
+                } else {
+                    blobPath.classList.remove('animated');
+                }
+                
+                this.showToast(this.isAnimated ? 'Animation started' : 'Animation stopped', 'info');
+            }
+
+            updateAnimation() {
+                const blobPath = document.getElementById('blobPath');
+                if (!this.isAnimated) return;
+                
+                const speed = parseInt(document.getElementById('animationSpeed').value);
+                const type = document.getElementById('animationType').value;
+                
+                // Remove all animation classes
+                blobPath.classList.remove('animated', 'pulse', 'morph', 'rotate');
+                
+                // Apply selected animation
+                blobPath.classList.add(type);
+                blobPath.style.animationDuration = `${5 - (speed / 2)}s`;
+            }
+
+            saveToHistory() {
+                if (this.currentBlob) {
+                    this.history.unshift({ ...this.currentBlob });
+                    if (this.history.length > 20) {
+                        this.history = this.history.slice(0, 20);
+                    }
+                    this.updateHistoryDisplay();
+                    this.saveToLocalStorage();
+                    this.showToast('Blob saved to history', 'success');
+                }
+            }
+
+            updateHistoryDisplay() {
+                const grid = document.getElementById('historyGrid');
+                grid.innerHTML = '';
+
+                this.history.forEach((blob, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    
+                    const svg = `
+                        <svg viewBox="0 0 400 400">
+                            <path d="${blob.path}" 
+                                  fill="${blob.fillColor}" 
+                                  stroke="${blob.strokeColor}"
+                                  stroke-width="${blob.strokeWidth}"
+                                  transform="translate(200,200)"/>
+                        </svg>
+                        <div class="history-item-info">
+                            ${blob.timestamp.toLocaleTimeString()}
+                        </div>
+                        <div class="history-item-delete" onclick="event.stopPropagation(); blobMaker.deleteHistoryItem(${index})">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+                    
+                    item.innerHTML = svg;
+                    item.onclick = () => this.restoreFromHistory(index);
+                    grid.appendChild(item);
+                });
+
+                document.getElementById('historyCount').textContent = this.history.length;
+            }
+
+            deleteHistoryItem(index) {
+                this.history.splice(index, 1);
+                this.updateHistoryDisplay();
+                this.saveToLocalStorage();
+                this.showToast('Item removed from history', 'info');
+            }
+
+            clearHistory() {
+                if (confirm('Are you sure you want to clear your history? This cannot be undone.')) {
+                    this.history = [];
+                    this.updateHistoryDisplay();
+                    this.saveToLocalStorage();
+                    this.showToast('History cleared', 'info');
+                }
+            }
+
+            restoreFromHistory(index) {
+                const blob = this.history[index];
+                
+                document.getElementById('complexity').value = blob.complexity;
+                document.getElementById('irregularity').value = blob.irregularity;
+                document.getElementById('size').value = blob.size;
+                document.getElementById('roundness').value = blob.roundness;
+                document.getElementById('fillColor').value = blob.fillColor;
+                document.getElementById('strokeColor').value = blob.strokeColor;
+                document.getElementById('strokeWidth').value = blob.strokeWidth;
+                document.getElementById('seed').value = blob.seed || 500;
+
+                ['complexity', 'irregularity', 'size', 'roundness', 'strokeWidth', 'seed'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+
+                this.generateBlob();
+                this.showToast('Blob restored from history', 'success');
+            }
+
+            exportSVG() {
+                if (!this.currentBlob) return;
+
+                const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <path d="${this.currentBlob.path}" 
+          fill="${this.currentBlob.fillColor}" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(200,200)"/>
+</svg>`;
+
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `blob-${Date.now()}.svg`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.exportCount++;
+                this.showToast('SVG downloaded successfully', 'success');
+            }
+
+            exportPNG() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 800;
+                canvas.height = 800;
+                const ctx = canvas.getContext('2d');
+
+                // Create a temporary SVG with higher resolution
+                const tempSvg = `
+                    <svg width="800" height="800" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <path d="${this.currentBlob.path}" 
+                              fill="${this.currentBlob.fillColor}" 
+                              stroke="${this.currentBlob.strokeColor}"
+                              stroke-width="${this.currentBlob.strokeWidth * 2}"
+                              transform="translate(200,200)"/>
+                    </svg>`;
+
+                const img = new Image();
+                const svgBlob = new Blob([tempSvg], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, 800, 800);
+                    canvas.toBlob(blob => {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `blob-${Date.now()}.png`;
+                        a.click();
+                        this.exportCount++;
+                        this.showToast('PNG downloaded successfully', 'success');
+                    });
+                    URL.revokeObjectURL(url);
+                };
+
+                img.src = url;
+            }
+
+            copyToClipboard() {
+                if (!this.currentBlob) return;
+
+                const svg = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <path d="${this.currentBlob.path}" 
+          fill="${this.currentBlob.fillColor}" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(200,200)"/>
+</svg>`;
+
+                navigator.clipboard.writeText(svg).then(() => {
+                    this.showToast('SVG code copied to clipboard!', 'success');
+                });
+            }
+
+            toggleCodeView() {
+                const codeOutput = document.getElementById('codeOutput');
+                codeOutput.style.display = codeOutput.style.display === 'none' ? 'block' : 'none';
+            }
+
+            updateCodeOutput() {
+                if (!this.currentBlob) return;
+
+                const code = `<!-- SVG Blob Generated with BlobCraft Pro -->
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <path d="${this.currentBlob.path}" 
+          fill="${this.currentBlob.fillColor}" 
+          stroke="${this.currentBlob.strokeColor}"
+          stroke-width="${this.currentBlob.strokeWidth}"
+          transform="translate(200,200)"/>
+</svg>`;
+
+                document.getElementById('codeOutput').textContent = code;
+            }
+
+            generateShareUrl() {
+                if (!this.currentBlob) return;
+                
+                const params = new URLSearchParams();
+                params.set('c', this.currentBlob.complexity);
+                params.set('i', this.currentBlob.irregularity);
+                params.set('s', this.currentBlob.size);
+                params.set('r', this.currentBlob.roundness);
+                params.set('fc', this.currentBlob.fillColor.substring(1));
+                params.set('sc', this.currentBlob.strokeColor.substring(1));
+                params.set('sw', this.currentBlob.strokeWidth);
+                params.set('sd', this.currentBlob.seed);
+                
+                const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+                document.getElementById('shareUrl').value = url;
+                
+                return url;
+            }
+
+            updateShareUrl() {
+                this.generateShareUrl();
+            }
+
+            copyUrl() {
+                const urlInput = document.getElementById('shareUrl');
+                urlInput.select();
+                navigator.clipboard.writeText(urlInput.value).then(() => {
+                    this.showToast('URL copied to clipboard!', 'success');
+                });
+            }
+
+            checkUrlParameters() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.size > 0) {
+                    // Load blob from URL parameters
+                    const complexity = parseInt(params.get('c')) || 8;
+                    const irregularity = parseInt(params.get('i')) || 50;
+                    const size = parseInt(params.get('s')) || 100;
+                    const roundness = parseInt(params.get('r')) || 50;
+                    const fillColor = `#${params.get('fc') || '667eea'}`;
+                    const strokeColor = `#${params.get('sc') || '764ba2'}`;
+                    const strokeWidth = parseInt(params.get('sw')) || 0;
+                    const seed = parseInt(params.get('sd')) || 500;
+                    
+                    document.getElementById('complexity').value = complexity;
+                    document.getElementById('irregularity').value = irregularity;
+                    document.getElementById('size').value = size;
+                    document.getElementById('roundness').value = roundness;
+                    document.getElementById('fillColor').value = fillColor;
+                    document.getElementById('strokeColor').value = strokeColor;
+                    document.getElementById('strokeWidth').value = strokeWidth;
+                    document.getElementById('seed').value = seed;
+                    
+                    ['complexity', 'irregularity', 'size', 'roundness', 'strokeWidth', 'seed'].forEach(id => {
+                        this.updateSliderValue(id);
+                    });
+                    
+                    this.generateBlob();
+                    this.showToast('Blob loaded from URL', 'success');
+                }
+            }
+
+            resetBlob() {
+                document.getElementById('complexity').value = 8;
+                document.getElementById('irregularity').value = 50;
+                document.getElementById('size').value = 100;
+                document.getElementById('roundness').value = 50;
+                document.getElementById('fillColor').value = '#667eea';
+                document.getElementById('strokeColor').value = '#764ba2';
+                document.getElementById('strokeWidth').value = 0;
+                document.getElementById('seed').value = 500;
+                
+                ['complexity', 'irregularity', 'size', 'roundness', 'strokeWidth', 'seed'].forEach(id => {
+                    this.updateSliderValue(id);
+                });
+                
+                this.generateBlob();
+                this.showToast('Blob reset to default', 'info');
+            }
+
+            updateStats() {
+                document.getElementById('blobCount').textContent = this.blobCount;
+                document.getElementById('exportCount').textContent = this.exportCount;
+                document.getElementById('historyCount').textContent = this.history.length;
+                
+                // Update session time
+                const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+                const minutes = Math.floor(elapsedSeconds / 60);
+                const seconds = elapsedSeconds % 60;
+                document.getElementById('totalTime').textContent = `${minutes}m ${seconds}s`;
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.getElementById('toastContainer').appendChild(toast);
+                
+                // Trigger reflow
+                void toast.offsetWidth;
+                
+                toast.classList.add('show');
+                
+                // Remove toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 3000);
+            }
+
+            handleResize() {
+                // Adjust canvas size on smaller screens
+                const canvasArea = document.querySelector('.canvas-area');
+                if (window.innerWidth < 768) {
+                    canvasArea.style.minHeight = '300px';
+                } else {
+                    canvasArea.style.minHeight = '500px';
+                }
+            }
+
+            saveToLocalStorage() {
+                localStorage.setItem('blobmaker-history', JSON.stringify(this.history));
+                localStorage.setItem('blobmaker-stats', JSON.stringify({
+                    blobCount: this.blobCount,
+                    exportCount: this.exportCount
+                }));
+            }
+
+            loadFromLocalStorage() {
+                // Load history
+                const history = localStorage.getItem('blobmaker-history');
+                if (history) {
+                    this.history = JSON.parse(history);
+                    this.updateHistoryDisplay();
+                }
+                
+                // Load stats
+                const stats = localStorage.getItem('blobmaker-stats');
+                if (stats) {
+                    const { blobCount, exportCount } = JSON.parse(stats);
+                    this.blobCount = blobCount || 0;
+                    this.exportCount = exportCount || 0;
+                }
+                
+                // Load theme preference
+                const darkMode = localStorage.getItem('blobmaker-darkmode');
+                if (darkMode === 'true') {
+                    this.isDarkMode = true;
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('themeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            }
+        }
+
+        // Initialize the app
+        const blobMaker = new BlobMakerPro();
+
+        // Add service worker for PWA functionality if supported
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+
+        // Add beforeinstallprompt event for PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button if needed
+            const installButton = document.createElement('button');
+            installButton.className = 'button button-primary';
+            installButton.innerHTML = '<i class="fas fa-download"></i> Install App';
+            installButton.style.marginLeft = '10px';
+            installButton.addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+            
+            document.querySelector('.header-actions').appendChild(installButton);
+        });
+    </script>
+</body>
+</html>
